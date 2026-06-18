@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ClickCard — CLS Client Hub</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" media="print" onload="this.media='all'" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap">
+<style>
+:root{
+  --teal:#51897d;--dark:#2f4f4f;--gold:#d79068;--cream:#f5f0e8;
+  --white:#fff;--light:#f4f7f6;--light2:#e8edee;--border:#dce3e1;
+  --muted:#6b8c8c;--muted2:#9eb3b3;--slate:#1e3333;
+  --danger:#c0544a;--success:#3a7d5c;--red:#c0544a;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Poppins',Arial,sans-serif;background:var(--light);color:var(--slate);min-height:100vh;}
+input,select,button,textarea{font-family:inherit;}
+
+/* Layout */
+.top-bar{background:var(--dark);padding:14px 24px;display:flex;align-items:center;gap:14px;position:sticky;top:0;z-index:100;}
+.top-bar h1{color:var(--cream);font-size:16px;font-weight:700;letter-spacing:.5px;}
+.top-bar .sub{color:rgba(245,240,232,.4);font-size:11px;}
+.top-bar .right{margin-left:auto;display:flex;gap:8px;align-items:center;}
+.sync-badge{font-size:10px;color:var(--cream);opacity:.5;}
+.container{max-width:1400px;margin:0 auto;padding:16px 20px;}
+
+/* Tier bar */
+.tier-bar{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px;}
+.tier-tile{background:var(--white);border-radius:12px;padding:12px;text-align:center;cursor:pointer;border:1.5px solid var(--border);transition:all .15s;}
+.tier-tile:hover{box-shadow:0 2px 12px rgba(47,79,79,.08);}
+.tier-tile .emoji{font-size:20px;}
+.tier-tile .count{font-size:22px;font-weight:800;}
+.tier-tile .label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);}
+
+/* Controls */
+.controls{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;align-items:center;}
+.search-box{flex:1;min-width:240px;padding:10px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:13px;background:var(--white);outline:none;transition:border-color .2s;}
+.search-box:focus{border-color:var(--teal);}
+.ctrl-select{padding:8px 12px;border:1.5px solid var(--border);border-radius:10px;font-size:12px;background:var(--white);cursor:pointer;}
+.btn{padding:8px 16px;border:1.5px solid var(--border);border-radius:10px;font-size:12px;font-weight:600;background:var(--white);cursor:pointer;transition:all .15s;}
+.btn:hover{background:var(--light);}
+.btn-teal{background:var(--teal);color:var(--cream);border-color:var(--teal);}
+.btn-teal:hover{background:var(--dark);}
+.btn-gold{background:var(--gold);color:#fff;border-color:var(--gold);}
+.result-count{font-size:12px;color:var(--muted);font-weight:600;white-space:nowrap;}
+
+/* Table */
+.cl-table{width:100%;border-collapse:separate;border-spacing:0;background:var(--white);border-radius:14px;overflow:hidden;border:1px solid var(--border);}
+.cl-table thead th{padding:10px 14px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);background:var(--light);text-align:left;border-bottom:1px solid var(--border);position:sticky;top:52px;z-index:10;}
+.cl-table tbody tr{cursor:pointer;transition:background .1s;}
+.cl-table tbody tr:hover{background:rgba(81,137,125,.04);}
+.cl-table tbody td{padding:10px 14px;font-size:13px;border-bottom:1px solid var(--light2);}
+.cl-table tbody tr:last-child td{border-bottom:none;}
+.cl-avatar{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0;}
+.tier-badge{display:inline-block;font-size:10px;font-weight:600;padding:2px 8px;border-radius:8px;white-space:nowrap;}
+.name-cell{display:flex;align-items:center;gap:10px;}
+.name-text{font-weight:600;color:var(--slate);}
+.email-text{font-size:11px;color:var(--muted);}
+
+/* Detail panel */
+.detail-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.3);z-index:200;}
+.detail-panel{position:fixed;right:0;top:0;bottom:0;width:480px;max-width:100%;background:var(--white);z-index:201;overflow-y:auto;box-shadow:-4px 0 24px rgba(47,79,79,.12);transform:translateX(100%);transition:transform .25s ease-out;}
+.detail-panel.open{transform:translateX(0);}
+.dp-header{background:var(--dark);padding:20px 24px;color:var(--cream);}
+.dp-close{position:absolute;top:16px;right:16px;background:rgba(255,255,255,.1);border:none;color:var(--cream);border-radius:8px;padding:6px 12px;cursor:pointer;font-size:16px;}
+.dp-body{padding:20px 24px;}
+.dp-card{background:var(--light);border-radius:10px;padding:14px 16px;margin-bottom:12px;}
+.dp-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);margin-bottom:4px;}
+.dp-val{font-size:14px;font-weight:600;color:var(--slate);}
+
+/* Loading */
+.loading{text-align:center;padding:48px;color:var(--muted);}
+.loading .spinner{width:32px;height:32px;border:3px solid var(--light2);border-top-color:var(--teal);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 12px;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* Mobile */
+@media(max-width:768px){
+  .tier-bar{grid-template-columns:repeat(2,1fr);}
+  .controls{flex-direction:column;}
+  .search-box{width:100%;}
+  .detail-panel{width:100%;}
+  .cl-table thead th,.cl-table tbody td{padding:8px 10px;font-size:12px;}
+  .hide-mobile{display:none;}
+}
+</style>
+</head>
+<body>
+
+<!-- Top bar -->
+<div class="top-bar">
+  <div>
+    <h1>⭐ ClickCard</h1>
+    <div class="sub">Click Lounge Studio — Client Hub</div>
+  </div>
+  <div class="right">
+    <span class="sync-badge" id="sync-status"></span>
+    <button class="btn" onclick="syncData()" id="sync-btn">🔄 Sync</button>
+    <button class="btn btn-gold" onclick="openCampaign()">✉ Campaign</button>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- Tier bar -->
+  <div class="tier-bar" id="tier-bar"></div>
+
+  <!-- Controls -->
+  <div class="controls">
+    <input class="search-box" type="text" id="search" placeholder="Search 0 clients by name, email, phone…" oninput="filterList()">
+    <select class="ctrl-select" id="filter" onchange="filterList()">
+      <option value="all">All Clients</option>
+      <optgroup label="Tier">
+        <option value="Gold VIP">👑 Gold VIP</option>
+        <option value="Silver">💎 Silver</option>
+        <option value="Bronze">⭐ Bronze</option>
+        <option value="New">🆕 New</option>
+      </optgroup>
+      <optgroup label="Type">
+        <option value="walkin">Walk-in</option>
+        <option value="booked">Booked</option>
+      </optgroup>
+    </select>
+    <select class="ctrl-select" id="sort" onchange="sortAndRender()">
+      <option value="alpha">A → Z</option>
+      <option value="points">Most Points</option>
+      <option value="sessions">Most Sessions</option>
+      <option value="spent">Most Spent</option>
+      <option value="recent">Recent First</option>
+    </select>
+    <span class="result-count" id="count">0 clients</span>
+  </div>
+
+  <!-- Table -->
+  <div id="table-wrap">
+    <div class="loading"><div class="spinner"></div>Loading clients from Google Sheets…</div>
+  </div>
+
+  <!-- Load more -->
+  <div id="load-more" style="display:none;text-align:center;padding:16px;">
+    <button class="btn btn-teal" onclick="loadMore()">Load More</button>
+    <span id="load-more-count" style="font-size:11px;color:var(--muted);margin-left:8px;"></span>
+  </div>
+</div>
+
+<!-- Detail panel -->
+<div class="detail-overlay" id="detail-overlay" onclick="closeDetail()"></div>
+<div class="detail-panel" id="detail-panel">
+  <button class="dp-close" onclick="closeDetail()">✕</button>
+  <div id="detail-content"></div>
+</div>
+
+<script>
+// ═══════════════════════════════════════
+// CONFIG
+// ═══════════════════════════════════════
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbx_Y5nH34Rq16JJ2AxBDr30ttmDFuic61OqoC0u3Wq0zogHEhfoV6qE7uiNagI43flVgw/exec';
+
+const TIERS = [
+  { name:'Gold VIP', emoji:'👑', min:500, color:'#b8860b', bg:'rgba(255,215,0,0.08)', border:'rgba(184,134,11,0.3)' },
+  { name:'Silver',   emoji:'💎', min:200, color:'#5b63d9', bg:'rgba(91,99,217,0.06)', border:'rgba(91,99,217,0.2)' },
+  { name:'Bronze',   emoji:'⭐', min:0,   color:'#d79068', bg:'rgba(215,144,104,0.06)', border:'rgba(215,144,104,0.2)' }
+];
+const NEW_TIER = { name:'New', emoji:'🆕', min:0, color:'#6b8c8c', bg:'#f4f7f6', border:'#dce3e1' };
+
+// ═══════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════
+let ALL_CLIENTS = []; // pre-computed, sorted
+let FILTERED    = []; // after search + filter
+let PAGE_SIZE   = 100;
+let SHOWN       = 0;
+let RAW_DATA    = {};
+
+// ═══════════════════════════════════════
+// GAS CALL
+// ═══════════════════════════════════════
+async function gasCall(action, payload){
+  const obj = { action, payload: payload||{} };
+  const b64 = btoa(unescape(encodeURIComponent(JSON.stringify(obj))));
+  const url = GAS_URL + '?d=' + encodeURIComponent(b64);
+  try {
+    const res = await fetch(url, {redirect:'follow'});
+    const text = await res.text();
+    if(text.startsWith('{') || text.startsWith('[')) return JSON.parse(text);
+    const m = text.match(/^[^(]+\((.+)\)\s*;?\s*$/s);
+    if(m) return JSON.parse(m[1]);
+    return {ok:false, error:'Invalid response'};
+  } catch(e) {
+    // Fallback to JSONP
+    return new Promise(function(resolve, reject){
+      const cb = '_cc_'+Math.random().toString(36).slice(2);
+      const timer = setTimeout(()=>{ delete window[cb]; reject(new Error('Timeout')); }, 20000);
+      window[cb] = function(d){ clearTimeout(timer); delete window[cb]; resolve(d); };
+      const sc = document.createElement('script');
+      sc.src = url + '&callback=' + cb;
+      sc.onerror = ()=>{ clearTimeout(timer); delete window[cb]; reject(new Error('Network error')); };
+      document.body.appendChild(sc);
+    });
+  }
+}
+
+// ═══════════════════════════════════════
+// DATA LOADING
+// ═══════════════════════════════════════
+async function syncData(){
+  const btn = document.getElementById('sync-btn');
+  const st  = document.getElementById('sync-status');
+  btn.disabled = true; btn.textContent = '⏳ Syncing…';
+  try {
+    const d = await gasCall('getAll');
+    if(!d.ok && !d.clients) throw new Error(d.error||'Failed');
+    RAW_DATA = d;
+    processClients(d);
+    st.textContent = '✅ Synced ' + new Date().toLocaleTimeString('en-PH',{timeZone:'Asia/Manila'});
+  } catch(e){
+    st.textContent = '❌ ' + e.message;
+  }
+  btn.disabled = false; btn.textContent = '🔄 Sync';
+}
+
+function processClients(d){
+  const clients = d.clients||[];
+  const txns    = d.transactions||[];
+  const regs    = d.registrations||[];
+  const pa      = d.pointsActivity||[];
+
+  // Build lookup maps once
+  const regCount = {}, lastVisit = {}, txnSpent = {}, txnCount = {}, hasSession = {};
+  regs.forEach(r=>{
+    const n = (r.fbName||'').toLowerCase();
+    regCount[n] = (regCount[n]||0)+1;
+    if(!lastVisit[n] || r.date > lastVisit[n]) lastVisit[n] = r.date;
+    hasSession[n] = true;
+  });
+  txns.forEach(t=>{
+    if(String(t.invoiceNum||'').startsWith('[VOID]')) return;
+    const n = (t.clientName||'').toLowerCase();
+    txnSpent[n] = (txnSpent[n]||0) + (+t.total||0);
+    txnCount[n] = (txnCount[n]||0) + 1;
+    hasSession[n] = true;
+  });
+
+  // Points from pointsActivity
+  const bonusPts = {};
+  (pa||[]).forEach(a=>{
+    const n = (a.fbName||'').toLowerCase();
+    bonusPts[n] = (bonusPts[n]||0) + (parseInt(a.points)||0);
+  });
+
+  ALL_CLIENTS = clients.map(c=>{
+    const nameL   = (c.fbName||'').toLowerCase();
+    const spend   = Math.floor((txnSpent[nameL]||0)/100);
+    const bonus   = bonusPts[nameL]||0;
+    const pts     = (parseInt(c.points)>0) ? parseInt(c.points) : spend + bonus;
+    const hasSess = hasSession[nameL] || c.type==='booked' || c.type==='walkin';
+    let tier = NEW_TIER;
+    if(hasSess){ for(let i=0;i<TIERS.length;i++){ if(pts>=TIERS[i].min){tier=TIERS[i];break;} } }
+
+    const searchStr = [c.fbName, c.email, c.phone, c.referredBy, tier.name].filter(Boolean).join(' ').toLowerCase();
+
+    return {
+      fbName:    c.fbName||'',
+      email:     c.email||'',
+      phone:     c.phone||'',
+      birthday:  c.birthday||'',
+      type:      c.type||'',
+      added:     c.added||'',
+      socialConsent: c.socialConsent||'',
+      referredBy: c.referredBy||'',
+      notes:     c.notes||'',
+      staffNotes:c.staffNotes||'',
+      points:    c.points||'',
+      _pts:      pts,
+      _tier:     tier,
+      _sessions: regCount[nameL]||0,
+      _spent:    txnSpent[nameL]||0,
+      _txns:     txnCount[nameL]||0,
+      _lastVisit:lastVisit[nameL]||c.added||'',
+      _search:   searchStr
+    };
+  });
+
+  sortAndRender();
+  renderTierBar();
+  document.getElementById('search').placeholder = 'Search '+ALL_CLIENTS.length+' clients by name, email, phone…';
+}
+
+// ═══════════════════════════════════════
+// TIER BAR
+// ═══════════════════════════════════════
+function renderTierBar(){
+  const bar = document.getElementById('tier-bar');
+  const counts = {};
+  TIERS.forEach(t=>counts[t.name]=0);
+  counts['New'] = 0;
+  ALL_CLIENTS.forEach(c=>counts[c._tier.name]=(counts[c._tier.name]||0)+1);
+  const all = [...TIERS, NEW_TIER];
+  bar.innerHTML = all.map(t=>{
+    const active = document.getElementById('filter').value === t.name;
+    return '<div class="tier-tile" style="border-color:'+t.border+';'+(active?'box-shadow:0 0 0 2px '+t.color+';':'')+'" onclick="document.getElementById(\'filter\').value=\''+t.name+'\';filterList()">'+
+      '<div class="emoji">'+t.emoji+'</div>'+
+      '<div class="count" style="color:'+t.color+';">'+(counts[t.name]||0)+'</div>'+
+      '<div class="label">'+t.name+'</div>'+
+    '</div>';
+  }).join('');
+}
+
+// ═══════════════════════════════════════
+// FILTER + SEARCH
+// ═══════════════════════════════════════
+function filterList(){
+  const q      = (document.getElementById('search').value||'').toLowerCase().trim();
+  const filter = document.getElementById('filter').value;
+
+  FILTERED = ALL_CLIENTS;
+  if(q) FILTERED = FILTERED.filter(c=> c._search.indexOf(q) !== -1);
+  if(filter !== 'all'){
+    if(['Gold VIP','Silver','Bronze','New'].includes(filter)){
+      FILTERED = FILTERED.filter(c=> c._tier.name === filter);
+    } else if(filter==='walkin'){
+      FILTERED = FILTERED.filter(c=> c.type==='walkin');
+    } else if(filter==='booked'){
+      FILTERED = FILTERED.filter(c=> c.type==='booked');
+    }
+  }
+
+  SHOWN = 0;
+  renderTable();
+  renderTierBar();
+}
+
+function sortAndRender(){
+  const sort = document.getElementById('sort').value;
+  if(sort==='alpha')    ALL_CLIENTS.sort((a,b)=> a.fbName.localeCompare(b.fbName));
+  if(sort==='points')   ALL_CLIENTS.sort((a,b)=> b._pts - a._pts);
+  if(sort==='sessions') ALL_CLIENTS.sort((a,b)=> b._sessions - a._sessions);
+  if(sort==='spent')    ALL_CLIENTS.sort((a,b)=> b._spent - a._spent);
+  if(sort==='recent')   ALL_CLIENTS.sort((a,b)=> (b.added||'').localeCompare(a.added||''));
+  filterList();
+}
+
+// ═══════════════════════════════════════
+// TABLE RENDER
+// ═══════════════════════════════════════
+function renderTable(){
+  const wrap = document.getElementById('table-wrap');
+  const countEl = document.getElementById('count');
+  SHOWN = Math.min(PAGE_SIZE, FILTERED.length);
+  countEl.textContent = FILTERED.length + ' client' + (FILTERED.length!==1?'s':'');
+
+  if(!FILTERED.length){
+    wrap.innerHTML = '<div class="loading" style="padding:48px;">No clients found.</div>';
+    document.getElementById('load-more').style.display = 'none';
+    return;
+  }
+
+  const rows = FILTERED.slice(0, SHOWN);
+  wrap.innerHTML = '<table class="cl-table"><thead><tr>'+
+    '<th>Client</th>'+
+    '<th>Tier</th>'+
+    '<th class="hide-mobile">Points</th>'+
+    '<th class="hide-mobile">Sessions</th>'+
+    '<th class="hide-mobile">Spent</th>'+
+    '<th class="hide-mobile">Last Visit</th>'+
+  '</tr></thead><tbody id="cl-tbody">'+
+    rows.map(renderRow).join('')+
+  '</tbody></table>';
+
+  updateLoadMore();
+}
+
+function renderRow(c){
+  const ini = c.fbName.split(' ').map(w=>w[0]||'').join('').slice(0,2).toUpperCase();
+  return '<tr onclick="openDetail(\''+encodeURIComponent(c.fbName)+'\')">'+
+    '<td><div class="name-cell">'+
+      '<div class="cl-avatar" style="background:'+c._tier.color+';">'+ini+'</div>'+
+      '<div><div class="name-text">'+esc(c.fbName)+'</div>'+
+        '<div class="email-text">'+(c.email||'No email')+'</div>'+
+      '</div>'+
+    '</div></td>'+
+    '<td><span class="tier-badge" style="background:'+c._tier.bg+';color:'+c._tier.color+';border:1px solid '+c._tier.border+';">'+c._tier.emoji+' '+c._tier.name+'</span></td>'+
+    '<td class="hide-mobile" style="font-weight:600;color:'+c._tier.color+';">'+c._pts+'</td>'+
+    '<td class="hide-mobile">'+c._sessions+'</td>'+
+    '<td class="hide-mobile">'+(c._spent>0?'₱'+fmt(c._spent):'—')+'</td>'+
+    '<td class="hide-mobile" style="font-size:11px;color:var(--muted);">'+c._lastVisit.slice(0,10)+'</td>'+
+  '</tr>';
+}
+
+function loadMore(){
+  const next = FILTERED.slice(SHOWN, SHOWN + PAGE_SIZE);
+  if(!next.length) return;
+  document.getElementById('cl-tbody').insertAdjacentHTML('beforeend', next.map(renderRow).join(''));
+  SHOWN += next.length;
+  updateLoadMore();
+}
+
+function updateLoadMore(){
+  const lm = document.getElementById('load-more');
+  const remaining = FILTERED.length - SHOWN;
+  if(remaining > 0){
+    lm.style.display = '';
+    document.getElementById('load-more-count').textContent = remaining + ' more';
+  } else {
+    lm.style.display = 'none';
+  }
+}
+
+// ═══════════════════════════════════════
+// DETAIL PANEL
+// ═══════════════════════════════════════
+function openDetail(encodedName){
+  const name = decodeURIComponent(encodedName);
+  const c = ALL_CLIENTS.find(x=>x.fbName===name);
+  if(!c) return;
+  const panel = document.getElementById('detail-panel');
+  const overlay = document.getElementById('detail-overlay');
+  const content = document.getElementById('detail-content');
+
+  const nextT = (function(){
+    const idx = TIERS.findIndex(t=>t.name===c._tier.name);
+    return idx > 0 ? TIERS[idx-1] : null;
+  })();
+  const pct = nextT ? Math.min(100, Math.round(((c._pts-c._tier.min)/(nextT.min-c._tier.min))*100)) : 100;
+
+  content.innerHTML = '<div class="dp-header" style="position:relative;">'+
+    '<div style="display:flex;align-items:center;gap:14px;">'+
+      '<div class="cl-avatar" style="background:'+c._tier.color+';width:48px;height:48px;font-size:16px;">'+c.fbName.split(' ').map(w=>w[0]||'').join('').slice(0,2).toUpperCase()+'</div>'+
+      '<div>'+
+        '<div style="font-size:18px;font-weight:700;">'+esc(c.fbName)+'</div>'+
+        '<span class="tier-badge" style="background:'+c._tier.bg+';color:'+c._tier.color+';border:1px solid '+c._tier.border+';margin-top:4px;">'+c._tier.emoji+' '+c._tier.name+' · '+c._pts+' pts</span>'+
+      '</div>'+
+    '</div>'+
+  '</div>'+
+  '<div class="dp-body">'+
+    // Points progress
+    '<div class="dp-card">'+
+      '<div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:6px;">'+
+        '<span style="font-weight:700;color:'+c._tier.color+';">🏅 '+c._pts+' points</span>'+
+        (nextT?'<span style="color:var(--muted);">'+nextT.emoji+' '+nextT.name+' at '+nextT.min+'</span>':'<span style="color:'+c._tier.color+';">Max tier!</span>')+
+      '</div>'+
+      '<div style="height:6px;background:var(--light2);border-radius:3px;overflow:hidden;">'+
+        '<div style="height:100%;width:'+pct+'%;background:'+c._tier.color+';border-radius:3px;"></div>'+
+      '</div>'+
+    '</div>'+
+    // Stats
+    '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px;">'+
+      '<div class="dp-card" style="text-align:center;"><div style="font-size:22px;font-weight:800;">'+c._sessions+'</div><div class="dp-label">Visits</div></div>'+
+      '<div class="dp-card" style="text-align:center;"><div style="font-size:22px;font-weight:800;">'+c._txns+'</div><div class="dp-label">Invoices</div></div>'+
+      '<div class="dp-card" style="text-align:center;"><div style="font-size:16px;font-weight:800;">'+(c._spent>0?'₱'+fmt(c._spent):'₱0')+'</div><div class="dp-label">Spent</div></div>'+
+    '</div>'+
+    // Contact
+    '<div class="dp-card">'+
+      '<div class="dp-label">Contact Info</div>'+
+      '<div style="font-size:13px;line-height:2;">'+
+        (c.email?'✉ '+esc(c.email)+'<br>':'<span style="color:var(--muted);">No email on file</span><br>')+
+        (c.phone?'📱 '+esc(c.phone)+'<br>':'')+
+        (c.birthday?'🎂 '+c.birthday+'<br>':'')+
+        (c.referredBy?'👥 Referred by: '+esc(c.referredBy)+'<br>':'')+
+        '📅 Client since: '+(c.added||'—')+'<br>'+
+        (c._lastVisit?'🕐 Last visit: '+c._lastVisit.slice(0,10)+'<br>':'')+
+        '📸 SM Consent: '+(c.socialConsent==='yes'?'✅ Yes':'🚫 No')+
+      '</div>'+
+    '</div>'+
+    // Notes
+    (c.notes||c.staffNotes?'<div class="dp-card">'+
+      '<div class="dp-label">Notes</div>'+
+      '<div style="font-size:13px;color:var(--muted);line-height:1.6;">'+(c.notes?esc(c.notes)+'<br>':'')+(c.staffNotes?'<strong>Staff:</strong> '+esc(c.staffNotes):'' )+'</div>'+
+    '</div>':'')+
+    // Actions
+    '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:16px;">'+
+      '<button class="btn btn-teal" onclick="logPoints(\''+encodeURIComponent(c.fbName)+'\')">🏅 Log Points</button>'+
+      '<button class="btn" onclick="redeemPoints(\''+encodeURIComponent(c.fbName)+'\')">🎁 Redeem</button>'+
+      (c.email?'<a class="btn" href="mailto:'+c.email+'" style="text-decoration:none;">✉ Email</a>':'')+
+    '</div>'+
+  '</div>';
+
+  overlay.style.display = 'block';
+  setTimeout(()=>panel.classList.add('open'), 10);
+}
+
+function closeDetail(){
+  document.getElementById('detail-panel').classList.remove('open');
+  setTimeout(()=>{ document.getElementById('detail-overlay').style.display='none'; }, 250);
+}
+
+function logPoints(encodedName){
+  const name = decodeURIComponent(encodedName);
+  const pts = prompt('Points to add for '+name+':');
+  if(!pts || isNaN(pts)) return;
+  const reason = prompt('Reason (e.g. referral bonus, session reward):') || 'Manual';
+  gasCall('logPoints', { fbName:name, points:parseInt(pts), action:reason }).then(r=>{
+    if(r.ok) alert('✅ '+pts+' points added to '+name);
+    else alert('Error: '+(r.error||'Failed'));
+    syncData();
+  });
+}
+
+function redeemPoints(encodedName){
+  const name = decodeURIComponent(encodedName);
+  const pts = prompt('Points to redeem for '+name+':');
+  if(!pts || isNaN(pts)) return;
+  const reward = prompt('Reward given:') || 'Redemption';
+  gasCall('logPoints', { fbName:name, points:-Math.abs(parseInt(pts)), action:'Redeemed: '+reward }).then(r=>{
+    if(r.ok) alert('✅ '+Math.abs(pts)+' points redeemed for '+name);
+    else alert('Error: '+(r.error||'Failed'));
+    syncData();
+  });
+}
+
+function openCampaign(){
+  const clients = FILTERED.filter(c=>c.email);
+  if(!clients.length){ alert('No clients with email in current view.'); return; }
+  const emails = clients.map(c=>c.email).join(',');
+  const subject = encodeURIComponent('Special Offer from Click Lounge Studio!');
+  window.open('https://mail.google.com/mail/u/0/?view=cm&fs=1&bcc='+encodeURIComponent(emails)+'&su='+subject, '_blank');
+}
+
+// ═══════════════════════════════════════
+// UTILS
+// ═══════════════════════════════════════
+function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function fmt(n){ return Number(n||0).toLocaleString('en-PH',{minimumFractionDigits:0,maximumFractionDigits:0}); }
+
+// ═══════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════
+syncData();
+</script>
+</body>
+</html>
