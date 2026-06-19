@@ -8,90 +8,128 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" media="print" onload="this.media='all'" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap">
 <style>
-:root{--teal:#51897d;--dark:#2f4f4f;--gold:#d79068;--cream:#f5f0e8;--white:#fff;--light:#f4f7f6;--light2:#e8edee;--border:#dce3e1;--muted:#6b8c8c;--slate:#1e3333;--danger:#c0544a;--success:#3a7d5c;}
+:root{
+  --teal:#51897d;--dark:#2f4f4f;--gold:#d79068;--cream:#f5f0e8;
+  --white:#fff;--light:#f4f7f6;--light2:#e8edee;--border:#dce3e1;
+  --muted:#6b8c8c;--slate:#1e3333;--danger:#c0544a;--success:#3a7d5c;
+}
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:'Poppins',Arial,sans-serif;background:var(--light);color:var(--slate);min-height:100vh;}
 input,select,button,textarea{font-family:inherit;}
 
 /* ── Top bar ── */
 .bar{background:var(--dark);padding:12px 20px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:200;}
-.bar h1{color:var(--cream);font-size:15px;font-weight:700;}.bar .sub{color:rgba(245,240,232,.35);font-size:10px;}
-.bar .r{margin-left:auto;display:flex;gap:8px;align-items:center;}.badge{font-size:10px;color:var(--muted2);color:rgba(245,240,232,.4);}
+.bar h1{color:var(--cream);font-size:15px;font-weight:700;}
+.bar .sub{color:rgba(245,240,232,.35);font-size:10px;}
+.bar .r{margin-left:auto;display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+.badge{font-size:10px;color:rgba(245,240,232,.5);}
 
 /* ── Tabs ── */
 .tabs{display:flex;border-bottom:2px solid var(--border);background:var(--white);position:sticky;top:48px;z-index:100;overflow-x:auto;}
-.tab{padding:10px 18px;font-size:12px;font-weight:600;color:var(--muted);border:none;background:none;cursor:pointer;white-space:nowrap;border-bottom:2px solid transparent;margin-bottom:-2px;}
+.tab{padding:10px 18px;font-size:12px;font-weight:600;color:var(--muted);border:none;background:none;cursor:pointer;white-space:nowrap;border-bottom:3px solid transparent;margin-bottom:-2px;transition:all .15s;}
 .tab.on{color:var(--teal);border-bottom-color:var(--teal);}
-.tab-count{font-size:10px;background:var(--light2);border-radius:8px;padding:1px 6px;margin-left:4px;}
-.tab-count.warn{background:rgba(192,84,74,.1);color:var(--danger);}
+.tc{font-size:10px;background:var(--light2);border-radius:8px;padding:1px 6px;margin-left:4px;}
+.tc.warn{background:rgba(192,84,74,.12);color:var(--danger);}
 
 /* ── Container ── */
-.c{max-width:1400px;margin:0 auto;padding:14px 18px;}
+.c{max-width:1440px;margin:0 auto;padding:14px 18px;}
 
 /* ── Buttons ── */
 .btn{padding:7px 14px;border:1.5px solid var(--border);border-radius:8px;font-size:11px;font-weight:600;background:var(--white);cursor:pointer;transition:all .15s;}
-.btn:hover{background:var(--light);}.btn:disabled{opacity:.5;cursor:default;}
-.btn-t{background:var(--teal);color:var(--cream);border-color:var(--teal);}.btn-t:hover{background:var(--dark);}
+.btn:hover{background:var(--light);}
+.btn:disabled{opacity:.5;cursor:default;}
+.btn-t{background:var(--teal);color:var(--cream);border-color:var(--teal);}
+.btn-t:hover{background:var(--dark);}
 .btn-g{background:var(--gold);color:#fff;border-color:var(--gold);}
 .btn-d{background:var(--danger);color:#fff;border-color:var(--danger);}
 .btn-sm{padding:4px 10px;font-size:10px;}
 
-/* ── Cards ── */
+/* ── KPI cards ── */
 .kpi-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:16px;}
 .kpi{background:var(--white);border-radius:12px;padding:14px 16px;border:1px solid var(--border);}
-.kpi-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);margin-bottom:4px;}
-.kpi-val{font-size:24px;font-weight:800;}.kpi-sub{font-size:10px;color:var(--muted);margin-top:2px;}
+.kpi-l{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);margin-bottom:4px;}
+.kpi-v{font-size:24px;font-weight:800;}
+.kpi-s{font-size:10px;color:var(--muted);margin-top:2px;}
 
 /* ── Pipeline ── */
 .pipeline{display:flex;gap:3px;margin-bottom:14px;overflow-x:auto;padding-bottom:4px;}
-.ps{flex:1;min-width:90px;text-align:center;padding:10px 6px;border-radius:10px;cursor:pointer;border:1.5px solid var(--border);background:var(--white);}
-.ps.on{box-shadow:0 0 0 2px rgba(81,137,125,.25);border-color:var(--teal);}
-.ps-n{font-size:19px;font-weight:800;}.ps-l{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);}
+.ps{flex:1;min-width:86px;text-align:center;padding:10px 6px;border-radius:10px;cursor:pointer;border:1.5px solid var(--border);background:var(--white);transition:all .15s;}
+.ps:hover{box-shadow:0 2px 8px rgba(47,79,79,.07);}
+.ps.on{box-shadow:0 0 0 2px rgba(81,137,125,.2);border-color:var(--teal);}
+.ps-n{font-size:19px;font-weight:800;}
+.ps-l{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);}
 
 /* ── Controls ── */
 .ctrls{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;align-items:center;}
 .search{flex:1;min-width:200px;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:12px;background:var(--white);outline:none;}
 .search:focus{border-color:var(--teal);}
-.sel{padding:7px 10px;border:1.5px solid var(--border);border-radius:8px;font-size:11px;background:var(--white);}
-.cnt-badge{font-size:11px;color:var(--muted);white-space:nowrap;font-weight:600;}
+.sel{padding:7px 10px;border:1.5px solid var(--border);border-radius:8px;font-size:11px;background:var(--white);cursor:pointer;}
+.cnt-b{font-size:11px;color:var(--muted);white-space:nowrap;font-weight:600;}
 
 /* ── Table ── */
 table{width:100%;border-collapse:separate;border-spacing:0;background:var(--white);border-radius:12px;overflow:hidden;border:1px solid var(--border);}
 th{padding:9px 12px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);background:var(--light);text-align:left;border-bottom:1px solid var(--border);}
 td{padding:9px 12px;font-size:12px;border-bottom:1px solid var(--light2);}
 tr:last-child td{border-bottom:none;}
-tr:hover td{background:rgba(81,137,125,.025);cursor:pointer;}
-.av{width:30px;height:30px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0;vertical-align:middle;}
+tr.cl-row{cursor:pointer;}
+tr.cl-row:hover td{background:rgba(81,137,125,.03);}
+.av{width:32px;height:32px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0;}
 .nc{display:flex;align-items:center;gap:8px;}
-.nm{font-weight:600;}.em{font-size:10px;color:var(--muted);}
+.nm{font-weight:600;}
+.em{font-size:10px;color:var(--muted);}
 .tb{display:inline-block;font-size:9px;font-weight:600;padding:2px 7px;border-radius:6px;white-space:nowrap;}
 .miss{background:rgba(192,84,74,.08);color:var(--danger);font-size:10px;padding:1px 6px;border-radius:4px;font-weight:600;}
-.ok-badge{background:rgba(58,125,92,.08);color:var(--success);font-size:10px;padding:1px 6px;border-radius:4px;font-weight:600;}
+.ok-b{background:rgba(58,125,92,.08);color:var(--success);font-size:10px;padding:1px 6px;border-radius:4px;font-weight:600;}
 
-/* ── Cleanup panel ── */
-.dup-card{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:10px;}
-.dup-group{background:rgba(192,84,74,.03);border:1.5px solid rgba(192,84,74,.15);border-radius:10px;padding:12px 14px;margin-bottom:10px;}
-.dup-row{display:flex;align-items:center;gap:10px;padding:6px 0;font-size:12px;border-bottom:1px solid var(--light2);}
-.dup-row:last-child{border-bottom:none;}
+/* ── Detail slide panel ── */
+.ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.3);z-index:400;}
+.dp{position:fixed;right:0;top:0;bottom:0;width:500px;max-width:100%;background:var(--white);z-index:401;overflow-y:auto;box-shadow:-4px 0 24px rgba(47,79,79,.15);transform:translateX(100%);transition:transform .25s ease-out;}
+.dp.open{transform:translateX(0);}
+.dp-h{background:var(--dark);padding:20px 24px;color:var(--cream);position:relative;}
+.dp-x{position:absolute;top:14px;right:14px;background:rgba(255,255,255,.12);border:none;color:var(--cream);border-radius:6px;padding:5px 11px;cursor:pointer;font-size:15px;}
+.dp-b{padding:20px 24px;}
+.card{background:var(--light);border-radius:10px;padding:13px 15px;margin-bottom:12px;}
+.card-l{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:5px;}
+.tl-item{padding:8px 0;border-bottom:1px solid var(--light2);font-size:12px;display:flex;gap:10px;align-items:flex-start;}
+.tl-item:last-child{border-bottom:none;}
+.tl-dot{width:8px;height:8px;border-radius:50%;margin-top:4px;flex-shrink:0;}
 
-/* ── Edit modal ── */
-.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:300;}
-.modal-bg.open{display:flex;align-items:center;justify-content:center;padding:16px;}
-.modal{background:var(--white);border-radius:16px;width:100%;max-width:520px;max-height:90vh;overflow-y:auto;}
-.modal-h{background:var(--dark);padding:18px 22px;border-radius:16px 16px 0 0;color:var(--cream);display:flex;justify-content:space-between;align-items:center;}
-.modal-b{padding:20px 22px;}
-.fg{margin-bottom:12px;}.fl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);display:block;margin-bottom:4px;}
-.fi{width:100%;padding:8px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;outline:none;}
+/* ── Points modal ── */
+.pm-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:500;}
+.pm-bg.open{display:flex;align-items:center;justify-content:center;padding:16px;}
+.pm{background:var(--white);border-radius:16px;width:100%;max-width:400px;}
+.pm-h{background:var(--dark);padding:16px 20px;border-radius:16px 16px 0 0;color:var(--cream);display:flex;justify-content:space-between;align-items:center;}
+.pm-b{padding:20px;}
+.fl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);display:block;margin-bottom:4px;}
+.fi{width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;outline:none;margin-bottom:12px;}
 .fi:focus{border-color:var(--teal);}
 
+/* ── Edit modal ── */
+.em-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:600;}
+.em-bg.open{display:flex;align-items:center;justify-content:center;padding:16px;}
+.em{background:var(--white);border-radius:16px;width:100%;max-width:520px;max-height:90vh;overflow-y:auto;}
+.em-h{background:var(--dark);padding:16px 20px;border-radius:16px 16px 0 0;color:var(--cream);display:flex;justify-content:space-between;align-items:center;}
+.em-b{padding:20px;}
+.fg{margin-bottom:12px;}
+
+/* ── Cleanup ── */
+.dup-card{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:10px;}
+.dup-group{background:rgba(192,84,74,.03);border:1.5px solid rgba(192,84,74,.15);border-radius:10px;padding:12px 14px;margin-bottom:10px;}
+.dup-row{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--light2);flex-wrap:wrap;}
+.dup-row:last-child{border-bottom:none;}
+
 /* ── Loading ── */
-.loading{text-align:center;padding:40px;color:var(--muted);}
-@media(max-width:768px){.pipeline{flex-wrap:wrap;}.ctrls{flex-direction:column;}.search{width:100%;}.hm{display:none;}}
+.loading{text-align:center;padding:48px;color:var(--muted);}
+@media(max-width:768px){
+  .pipeline{flex-wrap:wrap;}.ps{min-width:70px;}
+  .ctrls{flex-direction:column;}.search{width:100%;}
+  .dp{width:100%;}.hm{display:none;}
+}
 </style>
 </head>
 <body>
 
-<!-- Top bar -->
+<!-- ── Top bar ── -->
 <div class="bar">
   <div><h1>⭐ ClickCard CRM</h1><div class="sub">Click Lounge Studio</div></div>
   <div class="r">
@@ -102,25 +140,24 @@ tr:hover td{background:rgba(81,137,125,.025);cursor:pointer;}
   </div>
 </div>
 
-<!-- Tabs -->
+<!-- ── Tabs ── -->
 <div class="tabs">
-  <button class="tab on" onclick="showTab('crm')" id="t-crm">👥 CRM <span class="tab-count" id="tc-crm">0</span></button>
-  <button class="tab" onclick="showTab('cleanup')" id="t-cleanup">🔧 Data Cleanup <span class="tab-count warn" id="tc-cleanup">0</span></button>
-  <button class="tab" onclick="showTab('missing')" id="t-missing">🕳 Missing Info <span class="tab-count warn" id="tc-missing">0</span></button>
-  <button class="tab" onclick="showTab('dupes')" id="t-dupes">🔁 Duplicates <span class="tab-count warn" id="tc-dupes">0</span></button>
-  <button class="tab" onclick="showTab('oldimport')" id="t-oldimport">📦 Pre-Apr 2026 <span class="tab-count" id="tc-oldimport">0</span></button>
+  <button class="tab on" onclick="showTab('crm')" id="t-crm">👥 CRM <span class="tc" id="tc-crm">0</span></button>
+  <button class="tab" onclick="showTab('cleanup')" id="t-cleanup">🔧 Data Cleanup <span class="tc warn" id="tc-cleanup">0</span></button>
+  <button class="tab" onclick="showTab('missing')" id="t-missing">🕳 Missing Info <span class="tc warn" id="tc-missing">0</span></button>
+  <button class="tab" onclick="showTab('dupes')" id="t-dupes">🔁 Duplicates <span class="tc warn" id="tc-dupes">0</span></button>
+  <button class="tab" onclick="showTab('oldimport')" id="t-oldimport">📦 Pre-Apr 2026 <span class="tc" id="tc-oldimport">0</span></button>
 </div>
 
-<!-- Panels -->
 <div class="c">
 
-  <!-- ═══ CRM TAB ═══ -->
+  <!-- ════ CRM TAB ════ -->
   <div id="panel-crm">
     <div class="pipeline" id="pipeline"></div>
     <div class="ctrls">
       <input class="search" id="q" placeholder="Search clients…" oninput="filterCRM()">
       <select class="sel" id="sortBy" onchange="doSort()">
-        <option value="rfm">Best Clients (RFM)</option>
+        <option value="rfm">⭐ Best Clients (RFM)</option>
         <option value="alpha">A → Z</option>
         <option value="spent">Most Spent</option>
         <option value="sessions">Most Sessions</option>
@@ -137,76 +174,108 @@ tr:hover td{background:rgba(81,137,125,.025);cursor:pointer;}
         <option value="atrisk">⚠️ At Risk</option>
         <option value="dormant">💤 Dormant</option>
       </select>
-      <span class="cnt-badge" id="cnt">0</span>
+      <span class="cnt-b" id="cnt">0</span>
     </div>
     <div id="crm-wrap"><div class="loading">Loading…</div></div>
-    <div id="lm" style="display:none;text-align:center;padding:12px;"><button class="btn btn-t" onclick="loadMore()">Load More</button> <span class="cnt-badge" id="lmc"></span></div>
+    <div id="lm" style="display:none;text-align:center;padding:12px;">
+      <button class="btn btn-t" onclick="loadMore()">Load More</button>
+      <span class="cnt-b" id="lmc" style="margin-left:8px;"></span>
+    </div>
   </div>
 
-  <!-- ═══ CLEANUP TAB ═══ -->
+  <!-- ════ CLEANUP TAB ════ -->
   <div id="panel-cleanup" style="display:none;">
     <div class="kpi-row" id="cleanup-kpis"></div>
     <div id="cleanup-content"></div>
   </div>
 
-  <!-- ═══ MISSING INFO TAB ═══ -->
+  <!-- ════ MISSING INFO TAB ════ -->
   <div id="panel-missing" style="display:none;">
     <div class="ctrls">
       <input class="search" id="qm" placeholder="Search…" oninput="filterMissing()">
-      <select class="sel" id="missing-filter" onchange="filterMissing()">
+      <select class="sel" id="mf" onchange="filterMissing()">
         <option value="any">Any missing field</option>
         <option value="email">Missing email</option>
         <option value="phone">Missing phone</option>
         <option value="birthday">Missing birthday</option>
       </select>
-      <button class="btn btn-t" onclick="exportMissingCSV()">⬇ Export for editing</button>
-      <span class="cnt-badge" id="cnt-missing"></span>
+      <button class="btn btn-t" onclick="exportMissingCSV()">⬇ Export CSV</button>
+      <span class="cnt-b" id="cnt-m"></span>
     </div>
     <div id="missing-wrap"></div>
   </div>
 
-  <!-- ═══ DUPLICATES TAB ═══ -->
+  <!-- ════ DUPLICATES TAB ════ -->
   <div id="panel-dupes" style="display:none;">
-    <div class="dup-card" style="margin-bottom:14px;border-color:rgba(192,84,74,.2);background:rgba(192,84,74,.02);">
-      <div style="font-size:12px;font-weight:700;color:var(--slate);margin-bottom:4px;">🔁 How to resolve duplicates</div>
-      <p style="font-size:11px;color:var(--muted);line-height:1.6;">Each group below shows clients that may be the same person. <strong>Keep</strong> the most complete record (has email, more sessions, more spent). <strong>Delete</strong> the other. Deleting removes the record from the Clients sheet only — their Transactions and Registrations history stays intact.</p>
+    <div class="dup-card" style="margin-bottom:14px;border-color:rgba(192,84,74,.2);">
+      <div style="font-size:12px;font-weight:700;margin-bottom:4px;">🔁 How to resolve duplicates</div>
+      <p style="font-size:11px;color:var(--muted);line-height:1.6;">The ✓ KEEP record is the one with the most complete data. Click <strong>Edit</strong> to copy info between records before deleting. <strong>Delete</strong> removes from the Clients sheet only — transaction history stays intact.</p>
     </div>
     <div id="dupes-wrap"></div>
   </div>
 
-  <!-- ═══ PRE-APR 2026 IMPORT TAB ═══ -->
+  <!-- ════ PRE-APR 2026 TAB ════ -->
   <div id="panel-oldimport" style="display:none;">
     <div class="dup-card" style="margin-bottom:14px;">
-      <div style="font-size:12px;font-weight:700;color:var(--slate);margin-bottom:6px;">📦 Clients from before April 2026</div>
-      <p style="font-size:12px;color:var(--muted);line-height:1.6;margin-bottom:10px;">These clients came from your historical sales data. They may have incomplete contact info. Click any row to add their email, phone, and birthday so campaigns and reminders work for them.</p>
+      <div style="font-size:12px;font-weight:700;margin-bottom:6px;">📦 Clients from before April 2026</div>
+      <p style="font-size:11px;color:var(--muted);line-height:1.6;margin-bottom:10px;">Historical clients from old sales data. Click any row to fill in their email, phone, and birthday. Or export, fill in bulk, then re-import.</p>
       <div style="display:flex;gap:8px;flex-wrap:wrap;">
         <button class="btn btn-t" onclick="exportOldCSV()">⬇ Export all for bulk editing</button>
-        <label class="btn" style="cursor:pointer;">📥 Import updated CSV <input type="file" accept=".csv" style="display:none" onchange="importUpdatedCSV(this)"></label>
+        <label class="btn" style="cursor:pointer;">📥 Import updated CSV<input type="file" accept=".csv" style="display:none" onchange="importCSV(this)"></label>
       </div>
     </div>
     <div class="ctrls">
       <input class="search" id="qo" placeholder="Search…" oninput="filterOld()">
-      <select class="sel" id="old-filter" onchange="filterOld()">
+      <select class="sel" id="of" onchange="filterOld()">
         <option value="all">All pre-Apr 2026</option>
         <option value="no-email">Missing email</option>
-        <option value="no-contact">Missing both email & phone</option>
+        <option value="no-contact">Missing email & phone</option>
         <option value="has-email">Has email</option>
       </select>
-      <span class="cnt-badge" id="cnt-old"></span>
+      <span class="cnt-b" id="cnt-o"></span>
     </div>
     <div id="old-wrap"></div>
   </div>
 
 </div>
 
-<!-- Edit modal -->
-<div class="modal-bg" id="edit-bg" onclick="if(event.target===this)closeEdit()">
-  <div class="modal">
-    <div class="modal-h">
-      <span id="edit-title">Edit Client</span>
-      <button onclick="closeEdit()" style="background:rgba(255,255,255,.15);border:none;color:var(--cream);border-radius:6px;padding:5px 10px;cursor:pointer;">✕</button>
+<!-- ── Detail slide panel ── -->
+<div class="ov" id="ov" onclick="closeD()"></div>
+<div class="dp" id="dp">
+  <button class="dp-x" onclick="closeD()">✕</button>
+  <div id="dc"></div>
+</div>
+
+<!-- ── Points modal ── -->
+<div class="pm-bg" id="pm-bg" onclick="if(event.target===this)closePM()">
+  <div class="pm">
+    <div class="pm-h">
+      <span id="pm-title">Log Points</span>
+      <button onclick="closePM()" style="background:rgba(255,255,255,.12);border:none;color:var(--cream);border-radius:6px;padding:4px 10px;cursor:pointer;">✕</button>
     </div>
-    <div class="modal-b">
+    <div class="pm-b">
+      <label class="fl">Client</label>
+      <input class="fi" id="pm-name" readonly style="background:var(--light);">
+      <label class="fl" id="pm-pts-label">Points to Add</label>
+      <input class="fi" id="pm-pts" type="number" placeholder="e.g. 50">
+      <label class="fl">Reason</label>
+      <input class="fi" id="pm-reason" placeholder="e.g. Referral bonus, Birthday promo…">
+      <div style="display:flex;gap:8px;justify-content:flex-end;">
+        <button class="btn" onclick="closePM()">Cancel</button>
+        <button class="btn btn-t" id="pm-save" onclick="savePM()">💾 Save</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Edit modal ── -->
+<div class="em-bg" id="em-bg" onclick="if(event.target===this)closeEM()">
+  <div class="em">
+    <div class="em-h">
+      <span id="em-title">Edit Client</span>
+      <button onclick="closeEM()" style="background:rgba(255,255,255,.12);border:none;color:var(--cream);border-radius:6px;padding:4px 10px;cursor:pointer;">✕</button>
+    </div>
+    <div class="em-b">
       <div class="fg"><label class="fl">Full Name</label><input class="fi" id="ef-name" readonly style="background:var(--light);"></div>
       <div class="fg"><label class="fl">Email</label><input class="fi" id="ef-email" type="email" placeholder="e.g. maria@gmail.com"></div>
       <div class="fg"><label class="fl">Phone</label><input class="fi" id="ef-phone" type="tel" placeholder="e.g. 09171234567"></div>
@@ -215,14 +284,14 @@ tr:hover td{background:rgba(81,137,125,.025);cursor:pointer;}
       <div class="fg"><label class="fl">SM Consent</label>
         <select class="fi" id="ef-smc">
           <option value="">Not captured</option>
-          <option value="yes">✅ Yes — can share on social media</option>
+          <option value="yes">✅ Yes</option>
           <option value="no">🚫 No</option>
         </select>
       </div>
       <div class="fg"><label class="fl">Staff Notes</label><textarea class="fi" id="ef-notes" rows="2" placeholder="Internal notes…"></textarea></div>
-      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px;">
-        <button class="btn" onclick="closeEdit()">Cancel</button>
-        <button class="btn btn-t" onclick="saveEdit()">💾 Save Changes</button>
+      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:4px;">
+        <button class="btn" onclick="closeEM()">Cancel</button>
+        <button class="btn btn-t" onclick="saveEM()">💾 Save Changes</button>
       </div>
     </div>
   </div>
@@ -232,18 +301,21 @@ tr:hover td{background:rgba(81,137,125,.025);cursor:pointer;}
 const GAS='https://script.google.com/macros/s/AKfycbx_Y5nH34Rq16JJ2AxBDr30ttmDFuic61OqoC0u3Wq0zogHEhfoV6qE7uiNagI43flVgw/exec';
 
 const STAGES=[
-  {id:'lead',   l:'Lead',    c:'var(--muted)',  e:'🆕'},
-  {id:'booked', l:'Booked',  c:'#4a7fb5',       e:'📅'},
-  {id:'active', l:'Active',  c:'var(--teal)',    e:'🟢'},
-  {id:'loyal',  l:'Loyal',   c:'var(--gold)',    e:'⭐'},
-  {id:'vip',    l:'VIP',     c:'#b8860b',        e:'👑'},
-  {id:'atrisk', l:'At Risk', c:'#d48806',        e:'⚠️'},
-  {id:'dormant',l:'Dormant', c:'var(--danger)',  e:'💤'},
+  {id:'lead',   l:'Lead',    c:'#6b8c8c', e:'🆕', desc:'Registered, no session yet'},
+  {id:'booked', l:'Booked',  c:'#4a7fb5', e:'📅', desc:'Has upcoming booking'},
+  {id:'active', l:'Active',  c:'#51897d', e:'🟢', desc:'Session in last 60 days'},
+  {id:'loyal',  l:'Loyal',   c:'#d79068', e:'⭐', desc:'3+ sessions'},
+  {id:'vip',    l:'VIP',     c:'#b8860b', e:'👑', desc:'5+ sessions or ₱10K+ spent'},
+  {id:'atrisk', l:'At Risk', c:'#d48806', e:'⚠️', desc:'60–120 days since last visit'},
+  {id:'dormant',l:'Dormant', c:'#c0544a', e:'💤', desc:'120+ days since last visit'},
 ];
 
 let ALL=[],FILT=[],OLD=[],MISS=[],DUPES=[],SHOWN=0,PS=100,RAW={};
+let PM_MODE='add', PM_NAME='';
 
-// ═══ GAS ═══
+// ═══════════════════════════════════════
+//  GAS
+// ═══════════════════════════════════════
 async function gas(action,payload){
   const b=btoa(unescape(encodeURIComponent(JSON.stringify({action,payload:payload||{}}))));
   const u=GAS+'?d='+encodeURIComponent(b);
@@ -251,194 +323,180 @@ async function gas(action,payload){
     const r=await fetch(u,{redirect:'follow'});const t=await r.text();
     if(t.startsWith('{')||t.startsWith('['))return JSON.parse(t);
     const m=t.match(/^[^(]+\((.+)\)\s*;?\s*$/s);if(m)return JSON.parse(m[1]);
-    return{ok:false,error:'Invalid response'};
+    return{ok:false,error:'Bad response'};
   }catch(e){
     return new Promise((res,rej)=>{
-      const cb='_c'+Math.random().toString(36).slice(2);
+      const cb='_cc'+Math.random().toString(36).slice(2);
       const tm=setTimeout(()=>{delete window[cb];rej(new Error('Timeout'))},20000);
       window[cb]=d=>{clearTimeout(tm);delete window[cb];res(d);};
       const s=document.createElement('script');
-      s.src=u+'&callback='+cb;s.onerror=()=>{clearTimeout(tm);delete window[cb];rej(new Error('Network'));};
+      s.src=u+'&callback='+cb;
+      s.onerror=()=>{clearTimeout(tm);delete window[cb];rej(new Error('Network'));};
       document.body.appendChild(s);
     });
   }
 }
 
-// ═══ SYNC ═══
+// ═══════════════════════════════════════
+//  SYNC
+// ═══════════════════════════════════════
 async function doSync(){
   const b=document.getElementById('sb'),st=document.getElementById('ss');
-  b.disabled=true;b.textContent='⏳';
+  b.disabled=true;b.textContent='⏳ Syncing…';
   try{
     const d=await gas('getAll');
     if(!d.ok&&!d.clients)throw new Error(d.error||'Failed');
-    RAW=d;process(d);
-    st.textContent='✅ '+new Date().toLocaleTimeString('en-PH',{timeZone:'Asia/Manila'});
+    RAW=d;processData(d);
+    st.textContent='✅ Synced '+new Date().toLocaleTimeString('en-PH',{timeZone:'Asia/Manila'});
   }catch(e){st.textContent='❌ '+e.message;}
   b.disabled=false;b.textContent='🔄 Sync';
 }
-
 async function syncMissing(){
-  const st=document.getElementById('ss');
-  st.textContent='🔍 Finding missing clients…';
+  const st=document.getElementById('ss');st.textContent='🔍 Scanning…';
   try{
     const r=await gas('syncClients');
-    if(r.ok)st.textContent='✅ '+(r.message||'Done');
-    else st.textContent='⚠ '+(r.error||'Error');
+    st.textContent=r.ok?'✅ '+(r.message||'Done'):'⚠ '+(r.error||'Error');
     doSync();
   }catch(e){st.textContent='❌ '+e.message;}
 }
 
-// ═══ PROCESS ═══
-function process(d){
+// ═══════════════════════════════════════
+//  PROCESS DATA
+// ═══════════════════════════════════════
+function processData(d){
   const clients=d.clients||[];
   const txns=(d.transactions||[]).filter(t=>!String(t.invoiceNum||'').startsWith('[VOID]'));
   const regs=d.registrations||[],pa=d.pointsActivity||[],acks=d.acknowledgements||[];
 
-  // Merge clients from all sources
-  const knownNames=new Set(clients.map(c=>(c.fbName||'').toLowerCase().trim()));
+  // Merge clients from all data sources
+  const known=new Set(clients.map(c=>(c.fbName||'').toLowerCase().trim()));
   const extras=[];
-  regs.forEach(r=>{const n=(r.fbName||'').trim();if(n&&!knownNames.has(n.toLowerCase())){knownNames.add(n.toLowerCase());extras.push({fbName:n,email:r.email||'',phone:'',birthday:'',type:'walkin',added:r.date||'',socialConsent:'',referredBy:'',notes:'',staffNotes:'',points:''});}});
-  txns.forEach(t=>{const n=(t.clientName||'').trim();if(n&&!knownNames.has(n.toLowerCase())){knownNames.add(n.toLowerCase());extras.push({fbName:n,email:'',phone:'',birthday:'',type:'walkin',added:t.date||'',socialConsent:'',referredBy:'',notes:'',staffNotes:'',points:''});}});
-  acks.forEach(a=>{const n=(a.fbName||'').trim();if(n&&!knownNames.has(n.toLowerCase())){knownNames.add(n.toLowerCase());extras.push({fbName:n,email:a.email||'',phone:'',birthday:'',type:'booked',added:a.date||a.bookDate||'',socialConsent:'',referredBy:'',notes:'',staffNotes:'',points:''});}});
-  const all=[...clients,...extras];
+  regs.forEach(r=>{const n=(r.fbName||'').trim();if(n&&!known.has(n.toLowerCase())){known.add(n.toLowerCase());extras.push({fbName:n,email:r.email||'',phone:'',birthday:'',type:'walkin',added:r.date||'',socialConsent:'',referredBy:'',notes:'',staffNotes:'',points:'',_inSheet:false});}});
+  txns.forEach(t=>{const n=(t.clientName||'').trim();if(n&&!known.has(n.toLowerCase())){known.add(n.toLowerCase());extras.push({fbName:n,email:'',phone:'',birthday:'',type:'walkin',added:t.date||'',socialConsent:'',referredBy:'',notes:'',staffNotes:'',points:'',_inSheet:false});}});
+  acks.forEach(a=>{const n=(a.fbName||'').trim();if(n&&!known.has(n.toLowerCase())){known.add(n.toLowerCase());extras.push({fbName:n,email:a.email||'',phone:'',birthday:'',type:'booked',added:a.date||a.bookDate||'',socialConsent:'',referredBy:'',notes:'',staffNotes:'',points:'',_inSheet:false});}});
+  const sheetNames=new Set(clients.map(c=>(c.fbName||'').toLowerCase().trim()));
+  clients.forEach(c=>{c._inSheet=true;});
+  const allClients=[...clients,...extras];
 
-  // Lookup maps
-  const regC={},lastV={},txnS={},hasSess={};
+  // Lookup maps (single pass)
+  const regC={},lastV={},txnS={},txnC={},hasSess={};
   regs.forEach(r=>{const n=(r.fbName||'').toLowerCase();regC[n]=(regC[n]||0)+1;if(!lastV[n]||r.date>lastV[n])lastV[n]=r.date;hasSess[n]=true;});
-  txns.forEach(t=>{const n=(t.clientName||'').toLowerCase();txnS[n]=(txnS[n]||0)+(+t.total||0);hasSess[n]=true;});
-  const hasBooking={};
-  acks.forEach(a=>{const n=(a.fbName||'').toLowerCase();const st=String(a.status||'').toLowerCase();if(!st.includes('cancel'))hasBooking[n]=true;});
-  const bonusPts={};
-  (pa||[]).forEach(a=>{const n=(a.fbName||'').toLowerCase();bonusPts[n]=(bonusPts[n]||0)+(parseInt(a.points)||0);});
+  txns.forEach(t=>{const n=(t.clientName||'').toLowerCase();txnS[n]=(txnS[n]||0)+(+t.total||0);txnC[n]=(txnC[n]||0)+1;hasSess[n]=true;});
+  const hasBook={};
+  acks.forEach(a=>{const n=(a.fbName||'').toLowerCase();if(!String(a.status||'').toLowerCase().includes('cancel'))hasBook[n]=true;});
+  const bonusP={};
+  (pa||[]).forEach(a=>{const n=(a.fbName||'').toLowerCase();bonusP[n]=(bonusP[n]||0)+(parseInt(a.points)||0);});
 
-  const now=new Date(),today=todayStr();
-  const cut60 =dateOffset(-60), cut120=dateOffset(-120);
+  const now=new Date();
+  const cut60=dOffset(-60),cut120=dOffset(-120);
 
-  ALL=all.map(c=>{
+  ALL=allClients.map(c=>{
     const nL=(c.fbName||'').toLowerCase().trim();
-    const sessions=regC[nL]||0,spent=txnS[nL]||0,lastVisit=lastV[nL]||'';
+    const sessions=regC[nL]||0,spent=txnS[nL]||0,invoices=txnC[nL]||0;
+    const lastVisit=lastV[nL]||'';
     const hasSe=hasSess[nL]||c.type==='booked'||c.type==='walkin';
-    const pts=Math.max(parseInt(c.points)||0,Math.floor(spent/100)+(bonusPts[nL]||0));
+    const basePts=Math.floor(spent/100);
+    const pts=Math.max(parseInt(c.points)||0,basePts+(bonusP[nL]||0));
     let tier='New';if(hasSe){tier='Bronze';if(pts>=200)tier='Silver';if(pts>=500)tier='Gold VIP';}
+    // Lifecycle stage
     let stage='lead';
-    if(!hasSe&&hasBooking[nL])stage='booked';
-    else if(sessions>=5||spent>=10000)stage='vip';
-    else if(sessions>=3)stage='loyal';
-    else if(hasSe&&lastVisit>=cut60)stage='active';
-    else if(hasSe&&lastVisit>=cut120&&lastVisit<cut60)stage='atrisk';
-    else if(hasSe&&lastVisit<cut120&&lastVisit)stage='dormant';
-    else if(hasSe)stage='active';
+    if(!hasSe&&hasBook[nL])               stage='booked';
+    else if(sessions>=5||spent>=10000)     stage='vip';
+    else if(sessions>=3)                   stage='loyal';
+    else if(hasSe&&lastVisit>=cut60)       stage='active';
+    else if(hasSe&&lastVisit>=cut120)      stage='atrisk';
+    else if(hasSe&&lastVisit<cut120&&lastVisit) stage='dormant';
+    else if(hasSe)                         stage='active';
+    // RFM (1-5 each, max 15)
     let R=1,F=1,M=1;
     if(lastVisit){const days=Math.round((now-new Date(lastVisit+'T00:00:00'))/86400000);if(days<=7)R=5;else if(days<=30)R=4;else if(days<=60)R=3;else if(days<=120)R=2;}
     if(sessions>=10)F=5;else if(sessions>=5)F=4;else if(sessions>=3)F=3;else if(sessions>=2)F=2;
     if(spent>=10000)M=5;else if(spent>=5000)M=4;else if(spent>=2000)M=3;else if(spent>=500)M=2;
     const rfm=R+F+M;
-    const search=[c.fbName,c.email,c.phone,c.referredBy,tier,stage].filter(Boolean).join(' ').toLowerCase();
-    const fromOldData=!c.added||(c.added<'2026-04-01');
-    const inClientsSheet=clients.some(x=>(x.fbName||'').toLowerCase()===nL);
-    return{...c,_pts:pts,_tier:tier,_stage:stage,_sessions:sessions,_spent:spent,_lastVisit:lastVisit,_rfm:rfm,_R:R,_F:F,_M:M,_search:search,_old:fromOldData,_inSheet:inClientsSheet,_hasSe:hasSe};
+    const srch=[c.fbName,c.email,c.phone,c.referredBy,tier,stage].filter(Boolean).join(' ').toLowerCase();
+    const isOld=!c.added||(c.added<'2026-04-01');
+    return{...c,_pts:pts,_tier:tier,_stage:stage,_sessions:sessions,_spent:spent,_invoices:invoices,_lastVisit:lastVisit,_rfm:rfm,_R:R,_F:F,_M:M,_srch:srch,_old:isOld,_inSheet:c._inSheet||sheetNames.has(nL)};
   });
 
   ALL.sort((a,b)=>b._rfm-a._rfm);
-
-  // Categorize
   OLD=ALL.filter(c=>c._old||!c._inSheet);
   MISS=ALL.filter(c=>!c.email||!c.phone||!c.birthday);
-  DUPES=findDuplicates(all);
+  DUPES=findDupes(allClients);
 
-  // Update tab counts
+  // Tab counts
   document.getElementById('tc-crm').textContent=ALL.length;
-  document.getElementById('tc-cleanup').textContent=OLD.filter(c=>!c.email).length;
+  document.getElementById('tc-cleanup').textContent=ALL.filter(c=>!c.email).length;
   document.getElementById('tc-missing').textContent=MISS.length;
   document.getElementById('tc-dupes').textContent=DUPES.length;
   document.getElementById('tc-oldimport').textContent=OLD.length;
   document.getElementById('q').placeholder='Search '+ALL.length+' clients…';
 
   renderPipeline();filterCRM();
-  renderCleanup();renderMissing();renderDupes();renderOld();
+  renderCleanup();filterMissing();renderDupes();filterOld();
 }
 
-// ═══ DUPLICATE DETECTION ═══
-function findDuplicates(clients){
-  const groups=[];const seen=new Set();
-  // By exact email
-  const byEmail={};
-  clients.forEach(c=>{if(c.email){if(!byEmail[c.email])byEmail[c.email]=[];byEmail[c.email].push(c);}});
-  Object.values(byEmail).forEach(g=>{if(g.length>1&&!seen.has(g[0].fbName)){g.forEach(c=>seen.add(c.fbName));groups.push({reason:'Same email: '+g[0].email,clients:g});}});
-  // By similar name (first name + first letter of last name)
-  const byKey={};
-  clients.forEach(c=>{
-    const parts=(c.fbName||'').trim().split(/\s+/);
-    if(parts.length<2)return;
-    const key=(parts[0]+' '+parts[parts.length-1][0]).toLowerCase();
-    if(!byKey[key])byKey[key]=[];byKey[key].push(c);
-  });
-  Object.values(byKey).forEach(g=>{
-    if(g.length>1&&!g.some(c=>seen.has(c.fbName))){
-      // Only flag if names are actually different
-      const names=new Set(g.map(c=>(c.fbName||'').toLowerCase().trim()));
-      if(names.size>1){g.forEach(c=>seen.add(c.fbName));groups.push({reason:'Similar name',clients:g});}
-    }
-  });
-  return groups;
-}
-
-// ═══ PIPELINE ═══
+// ═══════════════════════════════════════
+//  PIPELINE
+// ═══════════════════════════════════════
 function renderPipeline(){
-  const counts={all:ALL.length};STAGES.forEach(s=>counts[s.id]=0);
-  ALL.forEach(c=>counts[c._stage]=(counts[c._stage]||0)+1);
-  const sf=document.getElementById('stageF')?.value||'all';
+  const sf=document.getElementById('stageF').value;
+  const counts={};STAGES.forEach(s=>counts[s.id]=0);ALL.forEach(c=>counts[c._stage]=(counts[c._stage]||0)+1);
   document.getElementById('pipeline').innerHTML=
     '<div class="ps'+(sf==='all'?' on':'')+'" onclick="document.getElementById(\'stageF\').value=\'all\';filterCRM()" style="border-color:var(--teal);">'+
       '<div class="ps-n" style="color:var(--teal);">'+ALL.length+'</div><div class="ps-l">All</div></div>'+
-    STAGES.map(s=>'<div class="ps'+(sf===s.id?' on':'')+'" onclick="document.getElementById(\'stageF\').value=\''+s.id+'\';filterCRM()" style="border-color:'+s.c+'" title="'+s.l+'">'+
-      '<div style="font-size:14px;">'+s.e+'</div>'+
-      '<div class="ps-n" style="color:'+s.c+';">'+(counts[s.id]||0)+'</div>'+
-      '<div class="ps-l">'+s.l+'</div></div>'
+    STAGES.map(s=>
+      '<div class="ps'+(sf===s.id?' on':'')+'" onclick="document.getElementById(\'stageF\').value=\''+s.id+'\';filterCRM()" style="border-color:'+s.c+';" title="'+s.desc+'">'+
+        '<div style="font-size:14px;">'+s.e+'</div>'+
+        '<div class="ps-n" style="color:'+s.c+';">'+(counts[s.id]||0)+'</div>'+
+        '<div class="ps-l">'+s.l+'</div></div>'
     ).join('');
 }
 
-// ═══ CRM TAB ═══
+// ═══════════════════════════════════════
+//  CRM TABLE
+// ═══════════════════════════════════════
 function filterCRM(){
   const q=(document.getElementById('q').value||'').toLowerCase().trim();
-  const sf=document.getElementById('stageF')?.value||'all';
+  const sf=document.getElementById('stageF').value;
   FILT=ALL;
   if(sf!=='all')FILT=FILT.filter(c=>c._stage===sf);
-  if(q)FILT=FILT.filter(c=>c._search.indexOf(q)!==-1);
-  SHOWN=0;renderTable();renderPipeline();
+  if(q)FILT=FILT.filter(c=>c._srch.indexOf(q)!==-1);
+  SHOWN=0;renderCRMTable();renderPipeline();
   document.getElementById('cnt').textContent=FILT.length+' client'+(FILT.length!==1?'s':'');
 }
 function doSort(){
   const s=document.getElementById('sortBy').value;
-  if(s==='rfm')ALL.sort((a,b)=>b._rfm-a._rfm);
-  if(s==='alpha')ALL.sort((a,b)=>a.fbName.localeCompare(b.fbName));
-  if(s==='spent')ALL.sort((a,b)=>b._spent-a._spent);
+  if(s==='rfm')     ALL.sort((a,b)=>b._rfm-a._rfm);
+  if(s==='alpha')   ALL.sort((a,b)=>a.fbName.localeCompare(b.fbName));
+  if(s==='spent')   ALL.sort((a,b)=>b._spent-a._spent);
   if(s==='sessions')ALL.sort((a,b)=>b._sessions-a._sessions);
-  if(s==='recent')ALL.sort((a,b)=>(b.added||'').localeCompare(a.added||''));
-  if(s==='recency')ALL.sort((a,b)=>(b._lastVisit||'').localeCompare(a._lastVisit||''));
+  if(s==='recent')  ALL.sort((a,b)=>(b.added||'').localeCompare(a.added||''));
+  if(s==='recency') ALL.sort((a,b)=>(b._lastVisit||'').localeCompare(a._lastVisit||''));
   filterCRM();
 }
-function renderTable(){
+function renderCRMTable(){
   const w=document.getElementById('crm-wrap');
   if(!FILT.length){w.innerHTML='<div class="loading">No clients match.</div>';document.getElementById('lm').style.display='none';return;}
   SHOWN=Math.min(PS,FILT.length);
-  w.innerHTML='<table><thead><tr><th>Client</th><th>Stage</th><th>Tier</th><th class="hm">RFM</th><th class="hm">Sessions</th><th class="hm">Spent</th><th class="hm">Last Visit</th><th>Info</th></tr></thead><tbody id="tb">'+FILT.slice(0,SHOWN).map(crmRow).join('')+'</tbody></table>';
+  w.innerHTML='<table><thead><tr><th>Client</th><th>Stage</th><th>Tier</th><th>RFM</th><th class="hm">Sessions</th><th class="hm">Spent</th><th class="hm">Last Visit</th></tr></thead><tbody id="tb">'+
+    FILT.slice(0,SHOWN).map(crmRow).join('')+'</tbody></table>';
   const r=FILT.length-SHOWN;const lm=document.getElementById('lm');
   if(r>0){lm.style.display='';document.getElementById('lmc').textContent=r+' more';}else lm.style.display='none';
 }
 function crmRow(c){
-  const ini=initials(c.fbName);const stg=STAGES.find(s=>s.id===c._stage)||STAGES[0];
-  const tc=tierColor(c._tier);const rfmC=rfmColor(c._rfm);
-  const missing=[];if(!c.email)missing.push('email');if(!c.phone)missing.push('phone');if(!c.birthday)missing.push('bday');
-  return '<tr onclick="openEdit(\''+esc(c.fbName)+'\')">'+
-    '<td><div class="nc"><div class="av" style="background:'+stg.c+';">'+ini+'</div><div><div class="nm">'+esc(c.fbName)+'</div><div class="em">'+(c.email||'<span style="color:var(--danger);">No email</span>')+'</div></div></div></td>'+
+  const ini=initials(c.fbName);
+  const stg=STAGES.find(s=>s.id===c._stage)||STAGES[0];
+  const tc=tierCol(c._tier);const rc=rfmCol(c._rfm);
+  return '<tr class="cl-row" onclick="openD(\''+esc(c.fbName)+'\')">'+
+    '<td><div class="nc"><div class="av" style="background:'+stg.c+';">'+ini+'</div>'+
+      '<div><div class="nm">'+esc(c.fbName)+'</div>'+
+      '<div class="em">'+(c.email?c.email:'<span style="color:var(--danger);">No email</span>')+'</div></div></div></td>'+
     '<td><span class="tb" style="background:'+stg.c+'22;color:'+stg.c+';border:1px solid '+stg.c+'33;">'+stg.e+' '+stg.l+'</span></td>'+
     '<td><span class="tb" style="background:'+tc+'15;color:'+tc+';">'+c._tier+'</span></td>'+
-    '<td class="hm"><span style="font-size:11px;font-weight:700;padding:2px 6px;border-radius:4px;background:'+rfmC.bg+';color:'+rfmC.c+';">'+c._rfm+'</span></td>'+
+    '<td><span style="font-size:11px;font-weight:800;padding:3px 8px;border-radius:6px;background:'+rc.bg+';color:'+rc.c+'" title="R='+c._R+' F='+c._F+' M='+c._M+'">'+c._rfm+'/15</span></td>'+
     '<td class="hm">'+c._sessions+'</td>'+
     '<td class="hm">'+(c._spent>0?'₱'+fmt(c._spent):'—')+'</td>'+
     '<td class="hm" style="font-size:10px;color:var(--muted);">'+(c._lastVisit||'—').slice(0,10)+'</td>'+
-    '<td>'+(missing.length?'<span class="miss">'+missing.join(', ')+' missing</span>':'<span class="ok-badge">✓ Complete</span>')+(c._old?'<span class="tb" style="background:rgba(215,144,104,.1);color:var(--gold);margin-left:4px;">pre-2026</span>':'')+'</td>'+
   '</tr>';
 }
 function loadMore(){
@@ -449,178 +507,169 @@ function loadMore(){
   if(r>0){lm.style.display='';document.getElementById('lmc').textContent=r+' more';}else lm.style.display='none';
 }
 
-// ═══ CLEANUP TAB ═══
-function renderCleanup(){
-  const noEmail=ALL.filter(c=>!c.email).length;
-  const noPhone=ALL.filter(c=>!c.phone).length;
-  const noBday=ALL.filter(c=>!c.birthday).length;
-  const noConsent=ALL.filter(c=>!c.socialConsent).length;
-  const notInSheet=ALL.filter(c=>!c._inSheet).length;
-  const emailPct=ALL.length?Math.round((1-noEmail/ALL.length)*100):0;
-  document.getElementById('cleanup-kpis').innerHTML=[
-    {l:'Missing Email',v:noEmail,c:'var(--danger)',sub:((ALL.length-noEmail)+'/'+ALL.length+' have email ('+emailPct+'%)')},
-    {l:'Missing Phone',v:noPhone,c:'var(--gold)',sub:'Can\'t send SMS reminders'},
-    {l:'Missing Birthday',v:noBday,c:'#5b63d9',sub:'Can\'t run birthday promos'},
-    {l:'No SM Consent',v:noConsent,c:'var(--muted)',sub:'Campaign visibility unknown'},
-    {l:'Not in Client Sheet',v:notInSheet,c:'var(--danger)',sub:'Run 🔍 Find Missing to fix'},
-    {l:'Duplicate Groups',v:DUPES.length,c:'#d48806',sub:'Review in Duplicates tab'},
-  ].map(k=>'<div class="kpi"><div class="kpi-label">'+k.l+'</div><div class="kpi-val" style="color:'+k.c+';">'+k.v+'</div><div class="kpi-sub">'+k.sub+'</div></div>').join('');
-
-  // Priority action list
-  let h='<div class="dup-card"><div style="font-size:12px;font-weight:700;margin-bottom:10px;">🎯 Priority Actions</div>';
-  const actions=[];
-  if(notInSheet>0)actions.push({icon:'🔍',text:'Click "Find Missing" — '+notInSheet+' clients from old sales aren\'t in the Clients sheet yet',btn:'Find Missing',fn:'syncMissing()'});
-  if(noEmail>0)actions.push({icon:'✉',text:noEmail+' clients have no email — campaigns can\'t reach them. Go to Missing Info tab to fill in.',btn:'Fix Now',fn:'showTab(\'missing\')'});
-  if(DUPES.length>0)actions.push({icon:'🔁',text:DUPES.length+' possible duplicate groups found — merging saves you from double-counting clients',btn:'Review',fn:'showTab(\'dupes\')'});
-  if(noBday>100)actions.push({icon:'🎂',text:noBday+' clients missing birthday — ask at next registration or export CSV for bulk fill',btn:'Export CSV',fn:'exportMissingCSV()'});
-  if(!actions.length)h+='<div style="color:var(--success);font-size:13px;">✅ No critical data issues found!</div>';
-  else actions.forEach(a=>{h+='<div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--light2);">'+
-    '<div style="font-size:18px;flex-shrink:0;">'+a.icon+'</div>'+
-    '<div style="flex:1;font-size:12px;line-height:1.5;">'+a.text+'</div>'+
-    '<button class="btn btn-t btn-sm" onclick="'+a.fn+'">'+a.btn+'</button></div>';});
-  h+='</div>';
-  document.getElementById('cleanup-content').innerHTML=h;
-}
-
-// ═══ MISSING INFO TAB ═══
-function renderMissing(){filterMissing();}
-function filterMissing(){
-  const q=(document.getElementById('qm')?.value||'').toLowerCase().trim();
-  const f=document.getElementById('missing-filter')?.value||'any';
-  let list=ALL.filter(c=>{
-    if(f==='email')return !c.email;
-    if(f==='phone')return !c.phone;
-    if(f==='birthday')return !c.birthday;
-    return !c.email||!c.phone||!c.birthday;
-  });
-  if(q)list=list.filter(c=>c._search.indexOf(q)!==-1);
-  document.getElementById('cnt-missing').textContent=list.length+' clients';
-  document.getElementById('missing-wrap').innerHTML='<table><thead><tr><th>Client</th><th>Email</th><th>Phone</th><th>Birthday</th><th class="hm">SM Consent</th><th>Action</th></tr></thead><tbody>'+
-    list.slice(0,200).map(c=>'<tr>'+
-      '<td><div class="nc"><div class="av" style="background:var(--muted);font-size:9px;">'+initials(c.fbName)+'</div><div class="nm">'+esc(c.fbName)+'</div></div></td>'+
-      '<td>'+(c.email?c.email:'<span class="miss">missing</span>')+'</td>'+
-      '<td>'+(c.phone?c.phone:'<span class="miss">missing</span>')+'</td>'+
-      '<td>'+(c.birthday?c.birthday:'<span class="miss">missing</span>')+'</td>'+
-      '<td class="hm">'+(c.socialConsent==='yes'?'✅':c.socialConsent==='no'?'🚫':'<span class="miss">unknown</span>')+'</td>'+
-      '<td><button class="btn btn-t btn-sm" onclick="openEdit(\''+esc(c.fbName)+'\')">Edit</button></td></tr>'
-    ).join('')+'</tbody></table>'+(list.length>200?'<div style="text-align:center;padding:12px;font-size:11px;color:var(--muted);">Showing 200 of '+list.length+'. Export CSV to bulk-edit.</div>':'');
-}
-
-// ═══ DUPLICATES TAB ═══
-function renderDupes(){
-  const el = document.getElementById('dupes-wrap');
-  if(!DUPES.length){
-    el.innerHTML='<div class="loading" style="color:var(--success);">✅ No duplicates detected.</div>';
-    return;
-  }
-  el.innerHTML = DUPES.map((g,gi)=>{
-    // Sort clients in group: most complete first (has email, most sessions, most spent)
-    const sorted = [...g.clients].sort((a,b)=>{
-      const scoreA = (a.email?3:0)+(a.phone?2:0)+(a.birthday?1:0)+(a._sessions*0.1)+(a._spent*0.001);
-      const scoreB = (b.email?3:0)+(b.phone?2:0)+(b.birthday?1:0)+(b._sessions*0.1)+(b._spent*0.001);
-      return scoreB - scoreA;
-    });
-    const recommended = sorted[0]; // best record to keep
-
-    return '<div class="dup-group" id="dg-'+gi+'">'+
-      '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">'+
-        '<div style="font-size:11px;font-weight:700;color:var(--danger);">⚠ '+g.reason+'</div>'+
-        '<div style="font-size:10px;color:var(--muted);">Recommended to keep: <strong style="color:var(--teal);">'+esc(recommended.fbName)+'</strong></div>'+
-      '</div>'+
-      sorted.map((c,ci)=>{
-        const isKeep = ci === 0;
-        const missing = [];
-        if(!c.email) missing.push('no email');
-        if(!c.phone) missing.push('no phone');
-        if(!c.birthday) missing.push('no bday');
-        return '<div class="dup-row" style="'+(isKeep?'background:rgba(81,137,125,.04);border-radius:8px;padding:8px 10px;':'')+' flex-wrap:wrap;gap:8px;">'+
-          '<div class="av" style="background:'+(isKeep?'var(--teal)':'var(--muted)')+';font-size:9px;width:28px;height:28px;">'+initials(c.fbName)+'</div>'+
-          '<div style="flex:1;min-width:150px;">'+
-            '<div style="display:flex;align-items:center;gap:6px;">'+
-              '<span class="nm">'+esc(c.fbName)+'</span>'+
-              (isKeep?'<span style="font-size:9px;background:rgba(81,137,125,.1);color:var(--teal);padding:1px 6px;border-radius:4px;font-weight:700;">✓ KEEP</span>':'')+
-            '</div>'+
-            '<div class="em">'+
-              (c.email?c.email:'<span style="color:var(--danger);">no email</span>')+
-              ' · '+(c.phone?c.phone:'no phone')+
-              ' · '+c._sessions+' sessions · ₱'+fmt(c._spent)+
-            '</div>'+
-          '</div>'+
-          '<div style="display:flex;gap:6px;align-items:center;flex-shrink:0;">'+
-            '<button class="btn btn-t btn-sm" onclick="openEdit(\''+esc(c.fbName)+'\')">✏ Edit</button>'+
-            (!isKeep && c._inSheet ?
-              '<button class="btn btn-d btn-sm" onclick="deleteDupe(\''+esc(c.fbName)+'\','+gi+')">🗑 Delete</button>' :
-              (!c._inSheet ? '<span style="font-size:10px;color:var(--muted);">not in sheet</span>' : '')
-            )+
-          '</div>'+
-        '</div>';
-      }).join('')+
-    '</div>';
-  }).join('');
-}
-
-async function deleteDupe(name, groupIdx){
-  const confirmed = confirm(
-    'Delete "'+name+'" from the Clients sheet?\n\n'+
-    '✅ Their transaction history stays intact\n'+
-    '✅ Their registration history stays intact\n'+
-    '❌ Their client record (name, email, phone, birthday) will be removed\n\n'+
-    'Only delete if this is a duplicate of another client.'
-  );
-  if(!confirmed) return;
-
-  // Remove from local ALL array
-  const idx = ALL.findIndex(c => c.fbName === name);
-  if(idx > -1) ALL.splice(idx, 1);
-
-  // Re-detect duplicates
-  DUPES = findDuplicates(ALL);
-  document.getElementById('tc-dupes').textContent = DUPES.length;
-  renderDupes();
-  renderCleanup();
-
-  // Push delete to GAS
-  showToast('🗑 Deleting '+name+'…');
-  try{
-    const r = await gas('deleteClient', {fbName: name});
-    if(r.ok) showToast('✅ Deleted: '+name);
-    else showToast('⚠ Local only — GAS: '+(r.error||'error'));
-  }catch(e){
-    showToast('⚠ Deleted locally — offline');
-  }
-}
-
-// ═══ PRE-APR 2026 TAB ═══
-function renderOld(){filterOld();}
-function filterOld(){
-  const q=(document.getElementById('qo')?.value||'').toLowerCase().trim();
-  const f=document.getElementById('old-filter')?.value||'all';
-  let list=OLD;
-  if(f==='no-email')list=list.filter(c=>!c.email);
-  if(f==='no-contact')list=list.filter(c=>!c.email&&!c.phone);
-  if(f==='has-email')list=list.filter(c=>!!c.email);
-  if(q)list=list.filter(c=>c._search.indexOf(q)!==-1);
-  list.sort((a,b)=>b._spent-a._spent);
-  document.getElementById('cnt-old').textContent=list.length+' clients';
-  document.getElementById('old-wrap').innerHTML='<table><thead><tr><th>Client</th><th>Added</th><th>Email</th><th>Phone</th><th class="hm">Sessions</th><th class="hm">Spent</th><th>Action</th></tr></thead><tbody>'+
-    list.slice(0,300).map(c=>'<tr>'+
-      '<td><div class="nc"><div class="av" style="background:'+(c._inSheet?'var(--muted)':'var(--danger)')+';font-size:9px;">'+initials(c.fbName)+'</div><div>'+
-        '<div class="nm">'+esc(c.fbName)+'</div>'+
-        (!c._inSheet?'<div style="font-size:9px;color:var(--danger);">not in Clients sheet</div>':'')+
-      '</div></div></td>'+
-      '<td style="font-size:11px;color:var(--muted);">'+(c.added||'—').slice(0,10)+'</td>'+
-      '<td>'+(c.email?'<span class="ok-badge">'+c.email.slice(0,25)+'</span>':'<span class="miss">missing</span>')+'</td>'+
-      '<td>'+(c.phone?'<span class="ok-badge">'+c.phone+'</span>':'<span class="miss">missing</span>')+'</td>'+
-      '<td class="hm">'+c._sessions+'</td>'+
-      '<td class="hm">'+(c._spent>0?'₱'+fmt(c._spent):'—')+'</td>'+
-      '<td><button class="btn btn-t btn-sm" onclick="openEdit(\''+esc(c.fbName)+'\')">Edit</button></td></tr>'
-    ).join('')+'</tbody></table>';
-}
-
-// ═══ EDIT MODAL ═══
-function openEdit(name){
+// ═══════════════════════════════════════
+//  DETAIL SLIDE PANEL
+// ═══════════════════════════════════════
+function openD(name){
   const c=ALL.find(x=>x.fbName===name);if(!c)return;
-  document.getElementById('edit-title').textContent='Edit: '+name;
+  const stg=STAGES.find(s=>s.id===c._stage)||STAGES[0];
+  const tc=tierCol(c._tier);const rc=rfmCol(c._rfm);
+  const ini=initials(c.fbName);
+  const nL=c.fbName.toLowerCase();
+
+  // Build timeline from all raw sources
+  const timeline=[];
+  (RAW.registrations||[]).filter(r=>(r.fbName||'').toLowerCase()===nL).forEach(r=>timeline.push({date:r.date||'',text:'📸 Studio visit'+(r.time?' at '+r.time:''),col:'var(--teal)'}));
+  (RAW.transactions||[]).filter(t=>(t.clientName||'').toLowerCase()===nL&&!String(t.invoiceNum||'').startsWith('[VOID]')).forEach(t=>timeline.push({date:t.date||'',text:'🧾 Invoice #'+(t.invoiceNum||'')+'  ₱'+fmt(+t.total||0)+' via '+(t.mop||''),col:'var(--gold)'}));
+  (RAW.acknowledgements||[]).filter(a=>(a.fbName||'').toLowerCase()===nL).forEach(a=>timeline.push({date:a.bookDate||a.date||'',text:'📅 '+(a.service||'Session')+' on '+(a.bookDate||'')+(a.timeSlot?' at '+a.timeSlot:'')+' — '+(a.status||'Pending'),col:'#4a7fb5'}));
+  (RAW.pointsActivity||[]).filter(a=>(a.fbName||'').toLowerCase()===nL).forEach(a=>timeline.push({date:a.date||'',text:'🏅 '+(a.action||'Points')+': '+(parseInt(a.points)>0?'+':'')+a.points+' pts',col:'var(--success)'}));
+  timeline.sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+
+  // Tier progress
+  const TIERS=[{n:'Bronze',min:0},{n:'Silver',min:200},{n:'Gold VIP',min:500}];
+  const tidx=TIERS.findIndex(t=>t.n===c._tier);
+  const nextT=tidx<TIERS.length-1?TIERS[tidx+1]:null;
+  const pct=nextT?Math.min(100,Math.round(((c._pts-TIERS[tidx].min)/(nextT.min-TIERS[tidx].min))*100)):100;
+
+  document.getElementById('dc').innerHTML=
+  '<div class="dp-h">'+
+    '<div style="display:flex;align-items:center;gap:14px;">'+
+      '<div class="av" style="background:'+stg.c+';width:46px;height:46px;font-size:15px;">'+ini+'</div>'+
+      '<div>'+
+        '<div style="font-size:18px;font-weight:700;margin-bottom:4px;">'+esc(c.fbName)+'</div>'+
+        '<div style="display:flex;gap:6px;flex-wrap:wrap;">'+
+          '<span class="tb" style="background:'+stg.c+'44;color:var(--cream);border:1px solid '+stg.c+'66;">'+stg.e+' '+stg.l+'</span>'+
+          '<span class="tb" style="background:'+tc+'44;color:var(--cream);">'+c._tier+' · '+c._pts+' pts</span>'+
+          '<span style="font-size:10px;font-weight:800;padding:2px 8px;border-radius:6px;background:'+rc.bg+';color:'+rc.c+';" title="R='+c._R+' F='+c._F+' M='+c._M+'">RFM '+c._rfm+'/15</span>'+
+        '</div>'+
+      '</div>'+
+    '</div>'+
+  '</div>'+
+  '<div class="dp-b">'+
+
+    // ── RFM SCORE BREAKDOWN ──
+    '<div class="card">'+
+      '<div class="card-l">📊 RFM Score Breakdown ('+c._rfm+'/15)</div>'+
+      '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:8px;">'+
+        [['R','Recency',c._R,'How recently visited'],['F','Frequency',c._F,'How often they come'],['M','Monetary',c._M,'How much they spend']].map(([k,l,v,d])=>{
+          const pct=v*20;const col=v>=4?'var(--success)':v>=3?'var(--teal)':v>=2?'var(--gold)':'var(--danger)';
+          return '<div style="text-align:center;">'+
+            '<div style="font-size:10px;font-weight:700;color:var(--muted);">'+k+' — '+l+'</div>'+
+            '<div style="height:6px;background:var(--light2);border-radius:3px;margin:5px 0;overflow:hidden;"><div style="height:100%;width:'+pct+'%;background:'+col+';border-radius:3px;"></div></div>'+
+            '<div style="font-size:22px;font-weight:800;color:'+col+';">'+v+'<span style="font-size:12px;color:var(--muted);">/5</span></div>'+
+            '<div style="font-size:9px;color:var(--muted);line-height:1.3;">'+d+'</div>'+
+          '</div>';
+        }).join('')+
+      '</div>'+
+    '</div>'+
+
+    // ── STATS ──
+    '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px;">'+
+      '<div class="card" style="text-align:center;"><div style="font-size:22px;font-weight:800;">'+c._sessions+'</div><div class="card-l">Visits</div></div>'+
+      '<div class="card" style="text-align:center;"><div style="font-size:22px;font-weight:800;">'+c._invoices+'</div><div class="card-l">Invoices</div></div>'+
+      '<div class="card" style="text-align:center;"><div style="font-size:16px;font-weight:800;">'+(c._spent>0?'₱'+fmt(c._spent):'₱0')+'</div><div class="card-l">Spent</div></div>'+
+      '<div class="card" style="text-align:center;"><div style="font-size:22px;font-weight:800;color:'+tc+';">'+c._pts+'</div><div class="card-l">Points</div></div>'+
+    '</div>'+
+
+    // ── TIER PROGRESS ──
+    '<div class="card">'+
+      '<div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:6px;">'+
+        '<span style="font-weight:700;color:'+tc+';">'+c._tier+' — '+c._pts+' pts</span>'+
+        (nextT?'<span style="color:var(--muted);">Next: '+nextT.n+' at '+nextT.min+' pts</span>':'<span style="color:'+tc+';">★ Max Tier</span>')+
+      '</div>'+
+      '<div style="height:7px;background:var(--light2);border-radius:4px;overflow:hidden;">'+
+        '<div style="height:100%;width:'+pct+'%;background:'+tc+';border-radius:4px;transition:width .5s;"></div>'+
+      '</div>'+
+      (nextT?'<div style="font-size:10px;color:var(--muted);margin-top:5px;">'+(nextT.min-c._pts)+' more pts to '+nextT.n+'</div>':'')+
+    '</div>'+
+
+    // ── CONTACT ──
+    '<div class="card">'+
+      '<div class="card-l">📇 Contact</div>'+
+      '<div style="font-size:12px;line-height:2.2;">'+
+        (c.email?'✉ '+esc(c.email):'<span style="color:var(--danger);">✉ No email — campaigns can\'t reach them</span>')+'<br>'+
+        (c.phone?'📱 '+esc(c.phone):'<span style="color:var(--muted);">📱 No phone</span>')+'<br>'+
+        (c.birthday?'🎂 '+c.birthday:'<span style="color:var(--muted);">🎂 No birthday on file</span>')+'<br>'+
+        (c.referredBy?'👥 Referred by '+esc(c.referredBy)+'<br>':'')+
+        '📅 Client since '+(c.added||'—').slice(0,10)+'<br>'+
+        (c._lastVisit?'🕐 Last visit: '+c._lastVisit.slice(0,10)+'<br>':'')+
+        '📸 SM Consent: '+(c.socialConsent==='yes'?'✅ Yes':c.socialConsent==='no'?'🚫 No':'⬜ Not captured')+
+      '</div>'+
+    '</div>'+
+
+    // ── ACTIONS ──
+    '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;">'+
+      '<button class="btn btn-t" onclick="openPM(\''+esc(c.fbName)+'\',\'add\')">🏅 Add Points</button>'+
+      '<button class="btn" onclick="openPM(\''+esc(c.fbName)+'\',\'redeem\')">🎁 Redeem Points</button>'+
+      '<button class="btn" onclick="openEM(\''+esc(c.fbName)+'\')">✏ Edit Profile</button>'+
+      (c.email?'<a class="btn" href="mailto:'+c.email+'" style="text-decoration:none;">✉ Email</a>':'')+
+    '</div>'+
+
+    // ── ACTIVITY TIMELINE ──
+    '<div class="card">'+
+      '<div class="card-l">📜 Activity Timeline ('+timeline.length+' events)</div>'+
+      (timeline.length?
+        '<div style="max-height:320px;overflow-y:auto;margin-top:8px;">'+
+          timeline.slice(0,30).map(t=>
+            '<div class="tl-item">'+
+              '<div class="tl-dot" style="background:'+t.col+';"></div>'+
+              '<div><div style="font-size:10px;color:var(--muted);">'+t.date.slice(0,10)+'</div><div>'+t.text+'</div></div>'+
+            '</div>'
+          ).join('')+
+          (timeline.length>30?'<div style="font-size:10px;color:var(--muted);padding:6px 0 2px;">+ '+(timeline.length-30)+' more events</div>':'')+
+        '</div>' :
+        '<div style="font-size:12px;color:var(--muted);padding:8px 0;">No activity recorded yet.</div>'
+      )+
+    '</div>'+
+
+    // Notes
+    (c.notes||c.staffNotes?'<div class="card"><div class="card-l">📝 Notes</div><div style="font-size:12px;color:var(--muted);line-height:1.6;">'+(c.notes?esc(c.notes)+'<br>':'')+(c.staffNotes?'<b>Staff:</b> '+esc(c.staffNotes):'')+'</div></div>':'')+
+  '</div>';
+
+  document.getElementById('ov').style.display='block';
+  document.body.style.overflow='hidden';
+  setTimeout(()=>document.getElementById('dp').classList.add('open'),10);
+}
+function closeD(){
+  document.getElementById('dp').classList.remove('open');
+  document.body.style.overflow='';
+  setTimeout(()=>document.getElementById('ov').style.display='none',250);
+}
+
+// ═══════════════════════════════════════
+//  POINTS MODAL
+// ═══════════════════════════════════════
+function openPM(name,mode){
+  PM_NAME=name;PM_MODE=mode;
+  document.getElementById('pm-name').value=name;
+  document.getElementById('pm-pts').value='';
+  document.getElementById('pm-reason').value='';
+  document.getElementById('pm-title').textContent=mode==='add'?'🏅 Add Points':'🎁 Redeem Points';
+  document.getElementById('pm-pts-label').textContent=mode==='add'?'Points to Add':'Points to Redeem';
+  document.getElementById('pm-save').textContent=mode==='add'?'✅ Add Points':'🎁 Redeem';
+  document.getElementById('pm-bg').classList.add('open');
+}
+function closePM(){document.getElementById('pm-bg').classList.remove('open');}
+async function savePM(){
+  const pts=parseInt(document.getElementById('pm-pts').value);
+  const reason=document.getElementById('pm-reason').value.trim()||( PM_MODE==='add'?'Manual add':'Redemption');
+  if(!pts||pts<=0){alert('Enter a valid number of points.');return;}
+  const finalPts=PM_MODE==='redeem'?-pts:pts;
+  closePM();
+  showToast((PM_MODE==='add'?'🏅 Adding ':'🎁 Redeeming ')+Math.abs(finalPts)+' pts for '+PM_NAME+'…');
+  try{
+    const r=await gas('logPoints',{fbName:PM_NAME,points:finalPts,action:reason});
+    if(r.ok){showToast('✅ Done! '+(finalPts>0?'+':'')+finalPts+' pts for '+PM_NAME);doSync();}
+    else showToast('⚠ '+(r.error||'Error'));
+  }catch(e){showToast('⚠ Offline — could not save points');}
+}
+
+// ═══════════════════════════════════════
+//  EDIT MODAL
+// ═══════════════════════════════════════
+function openEM(name){
+  const c=ALL.find(x=>x.fbName===name);if(!c)return;
+  document.getElementById('em-title').textContent='Edit: '+name;
   document.getElementById('ef-name').value=name;
   document.getElementById('ef-email').value=c.email||'';
   document.getElementById('ef-phone').value=c.phone||'';
@@ -628,73 +677,208 @@ function openEdit(name){
   document.getElementById('ef-ref').value=c.referredBy||'';
   document.getElementById('ef-smc').value=c.socialConsent||'';
   document.getElementById('ef-notes').value=c.staffNotes||'';
-  document.getElementById('edit-bg').classList.add('open');
+  document.getElementById('em-bg').classList.add('open');
 }
-function closeEdit(){document.getElementById('edit-bg').classList.remove('open');}
-async function saveEdit(){
+function closeEM(){document.getElementById('em-bg').classList.remove('open');}
+async function saveEM(){
   const name=document.getElementById('ef-name').value;
-  const payload={
-    fbName:name,email:document.getElementById('ef-email').value.trim(),
-    phone:document.getElementById('ef-phone').value.trim(),
-    birthday:document.getElementById('ef-birthday').value,
-    referredBy:document.getElementById('ef-ref').value.trim(),
-    socialConsent:document.getElementById('ef-smc').value,
-    staffNotes:document.getElementById('ef-notes').value.trim(),
-  };
-  // Update local ALL array immediately
-  const c=ALL.find(x=>x.fbName===name);
-  if(c)Object.assign(c,payload);
-  closeEdit();
-  // Push to GAS
+  const payload={fbName:name,email:document.getElementById('ef-email').value.trim(),phone:document.getElementById('ef-phone').value.trim(),birthday:document.getElementById('ef-birthday').value,referredBy:document.getElementById('ef-ref').value.trim(),socialConsent:document.getElementById('ef-smc').value,staffNotes:document.getElementById('ef-notes').value.trim()};
+  const c=ALL.find(x=>x.fbName===name);if(c)Object.assign(c,payload);
+  closeEM();
+  showToast('💾 Saving '+name+'…');
   try{
     const r=await gas('saveClient',payload);
-    if(r.ok)showToast('✅ Saved: '+name);
-    else showToast('⚠ Saved locally — GAS: '+(r.error||'error'));
+    showToast(r.ok?'✅ Saved: '+name:'⚠ Local only — '+(r.error||'Error'));
   }catch(e){showToast('⚠ Saved locally — offline');}
-  // Re-render current tab
-  renderMissing();renderOld();renderCleanup();
+  filterMissing();filterOld();renderCleanup();
   if(document.getElementById('panel-crm').style.display!=='none')filterCRM();
+  // Refresh detail panel if open
+  if(document.getElementById('dp').classList.contains('open'))openD(name);
+}
+// Also allow opening edit from the detail panel
+function openEdit(name){openEM(name);}
+
+// ═══════════════════════════════════════
+//  DATA CLEANUP TAB
+// ═══════════════════════════════════════
+function renderCleanup(){
+  const noEmail=ALL.filter(c=>!c.email).length;
+  const noPhone=ALL.filter(c=>!c.phone).length;
+  const noBday=ALL.filter(c=>!c.birthday).length;
+  const noConsent=ALL.filter(c=>!c.socialConsent).length;
+  const notInSheet=ALL.filter(c=>!c._inSheet).length;
+  const emailPct=ALL.length?Math.round((ALL.length-noEmail)/ALL.length*100):0;
+  document.getElementById('cleanup-kpis').innerHTML=[
+    {l:'Missing Email',v:noEmail,c:'var(--danger)',s:emailPct+'% have email'},
+    {l:'Missing Phone',v:noPhone,c:'var(--gold)',s:'Can\'t send SMS'},
+    {l:'Missing Birthday',v:noBday,c:'#5b63d9',s:'Can\'t run bday promos'},
+    {l:'No SM Consent',v:noConsent,c:'var(--muted)',s:'Unknown visibility'},
+    {l:'Not in Client Sheet',v:notInSheet,c:'var(--danger)',s:'Run 🔍 Find Missing'},
+    {l:'Duplicate Groups',v:DUPES.length,c:'#d48806',s:'See Duplicates tab'},
+  ].map(k=>'<div class="kpi"><div class="kpi-l">'+k.l+'</div><div class="kpi-v" style="color:'+k.c+';">'+k.v+'</div><div class="kpi-s">'+k.s+'</div></div>').join('');
+  let h='<div class="dup-card"><div style="font-size:12px;font-weight:700;margin-bottom:10px;">🎯 Priority Actions</div>';
+  const acts=[];
+  if(notInSheet)acts.push({i:'🔍',t:notInSheet+' clients from old data are missing from the Clients sheet. Click Find Missing to fix.',b:'Find Missing',fn:'syncMissing()'});
+  if(noEmail>0)acts.push({i:'✉',t:noEmail+' clients have no email — campaigns can\'t reach them.',b:'Fix Now',fn:'showTab(\'missing\')'});
+  if(DUPES.length)acts.push({i:'🔁',t:DUPES.length+' potential duplicate groups detected.',b:'Review',fn:'showTab(\'dupes\')'});
+  if(noBday>50)acts.push({i:'🎂',t:noBday+' clients missing birthday. Export CSV for bulk fill.',b:'Export CSV',fn:'exportMissingCSV()'});
+  if(!acts.length)h+='<div style="color:var(--success);font-size:13px;">✅ No critical issues!</div>';
+  else acts.forEach(a=>{h+='<div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--light2);">'+
+    '<div style="font-size:18px;flex-shrink:0;">'+a.i+'</div>'+
+    '<div style="flex:1;font-size:12px;line-height:1.5;">'+a.t+'</div>'+
+    '<button class="btn btn-t btn-sm" onclick="'+a.fn+'">'+a.b+'</button></div>';});
+  h+='</div>';
+  document.getElementById('cleanup-content').innerHTML=h;
 }
 
-// ═══ EXPORTS ═══
-function exportMissingCSV(){
-  const list=ALL.filter(c=>!c.email||!c.phone||!c.birthday);
-  dlCSV(list,'cls_missing_info.csv');
+// ═══════════════════════════════════════
+//  MISSING INFO TAB
+// ═══════════════════════════════════════
+function filterMissing(){
+  const q=(document.getElementById('qm')?.value||'').toLowerCase().trim();
+  const f=document.getElementById('mf')?.value||'any';
+  let list=ALL.filter(c=>{if(f==='email')return !c.email;if(f==='phone')return !c.phone;if(f==='birthday')return !c.birthday;return !c.email||!c.phone||!c.birthday;});
+  if(q)list=list.filter(c=>c._srch.indexOf(q)!==-1);
+  document.getElementById('cnt-m').textContent=list.length+' clients';
+  document.getElementById('missing-wrap').innerHTML='<table><thead><tr><th>Client</th><th>Email</th><th>Phone</th><th>Birthday</th><th class="hm">SM Consent</th><th>Action</th></tr></thead><tbody>'+
+    list.slice(0,200).map(c=>'<tr>'+
+      '<td><div class="nc"><div class="av" style="background:var(--muted);font-size:9px;">'+initials(c.fbName)+'</div><span class="nm">'+esc(c.fbName)+'</span></div></td>'+
+      '<td>'+(c.email||'<span class="miss">missing</span>')+'</td>'+
+      '<td>'+(c.phone||'<span class="miss">missing</span>')+'</td>'+
+      '<td>'+(c.birthday||'<span class="miss">missing</span>')+'</td>'+
+      '<td class="hm">'+(c.socialConsent==='yes'?'✅':c.socialConsent==='no'?'🚫':'<span class="miss">unknown</span>')+'</td>'+
+      '<td><button class="btn btn-t btn-sm" onclick="openEM(\''+esc(c.fbName)+'\')">Edit</button></td></tr>'
+    ).join('')+'</tbody></table>'+(list.length>200?'<p style="font-size:11px;color:var(--muted);text-align:center;padding:12px;">Showing 200. Export CSV to bulk-edit.</p>':'');
 }
-function exportOldCSV(){
-  dlCSV(OLD,'cls_pre_apr2026_clients.csv');
+
+// ═══════════════════════════════════════
+//  DUPLICATES TAB
+// ═══════════════════════════════════════
+function findDupes(clients){
+  const groups=[];const seen=new Set();
+  const byEmail={};
+  clients.forEach(c=>{if(c.email){if(!byEmail[c.email])byEmail[c.email]=[];byEmail[c.email].push(c);}});
+  Object.values(byEmail).forEach(g=>{if(g.length>1&&!seen.has(g[0].fbName)){g.forEach(c=>seen.add(c.fbName));groups.push({reason:'Same email: '+g[0].email,clients:g});}});
+  const byKey={};
+  clients.forEach(c=>{
+    const parts=(c.fbName||'').trim().split(/\s+/);if(parts.length<2)return;
+    const key=(parts[0]+' '+parts[parts.length-1][0]).toLowerCase();
+    if(!byKey[key])byKey[key]=[];byKey[key].push(c);
+  });
+  Object.values(byKey).forEach(g=>{
+    if(g.length>1&&!g.some(c=>seen.has(c.fbName))){
+      const names=new Set(g.map(c=>(c.fbName||'').toLowerCase().trim()));
+      if(names.size>1){g.forEach(c=>seen.add(c.fbName));groups.push({reason:'Similar name',clients:g});}
+    }
+  });
+  return groups;
 }
+function renderDupes(){
+  const el=document.getElementById('dupes-wrap');
+  if(!DUPES.length){el.innerHTML='<div class="loading" style="color:var(--success);">✅ No duplicates detected.</div>';return;}
+  el.innerHTML=DUPES.map((g,gi)=>{
+    const sorted=[...g.clients].sort((a,b)=>{
+      const sA=(a.email?3:0)+(a.phone?2:0)+(a.birthday?1:0)+(a._sessions*.1)+(a._spent*.0001);
+      const sB=(b.email?3:0)+(b.phone?2:0)+(b.birthday?1:0)+(b._sessions*.1)+(b._spent*.0001);
+      return sB-sA;
+    });
+    return '<div class="dup-group" id="dg-'+gi+'">'+
+      '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">'+
+        '<div style="font-size:11px;font-weight:700;color:var(--danger);">⚠ '+g.reason+'</div>'+
+        '<div style="font-size:10px;color:var(--muted);">Recommended keep: <strong style="color:var(--teal);">'+esc(sorted[0].fbName)+'</strong></div>'+
+      '</div>'+
+      sorted.map((c,ci)=>{
+        const isKeep=ci===0;
+        return '<div class="dup-row" style="'+(isKeep?'background:rgba(81,137,125,.05);border-radius:8px;padding:8px 10px;':'')+'">'+
+          '<div class="av" style="background:'+(isKeep?'var(--teal)':'var(--muted)')+';font-size:9px;width:28px;height:28px;">'+initials(c.fbName)+'</div>'+
+          '<div style="flex:1;min-width:140px;">'+
+            '<div style="display:flex;align-items:center;gap:6px;">'+
+              '<span class="nm">'+esc(c.fbName)+'</span>'+
+              (isKeep?'<span style="font-size:9px;background:rgba(81,137,125,.15);color:var(--teal);padding:1px 6px;border-radius:4px;font-weight:700;">✓ KEEP</span>':'')+
+            '</div>'+
+            '<div class="em">'+(c.email||'<span style="color:var(--danger);">no email</span>')+' · '+(c.phone||'no phone')+' · '+c._sessions+' sessions · ₱'+fmt(c._spent)+'</div>'+
+          '</div>'+
+          '<div style="display:flex;gap:6px;align-items:center;flex-shrink:0;">'+
+            '<button class="btn btn-t btn-sm" onclick="openD(\''+esc(c.fbName)+'\')">View</button>'+
+            '<button class="btn btn-sm" onclick="openEM(\''+esc(c.fbName)+'\')">✏</button>'+
+            (!isKeep&&c._inSheet?'<button class="btn btn-d btn-sm" onclick="deleteDupe(\''+esc(c.fbName)+'\','+gi+')">🗑 Delete</button>':(!c._inSheet?'<span style="font-size:10px;color:var(--muted);">not in sheet</span>':''))+
+          '</div>'+
+        '</div>';
+      }).join('')+
+    '</div>';
+  }).join('');
+}
+async function deleteDupe(name,gi){
+  if(!confirm('Delete "'+name+'" from the Clients sheet?\n\n✅ Transaction & registration history stays\n❌ Client profile record will be removed\n\nOnly do this if it is a duplicate.'))return;
+  const idx=ALL.findIndex(c=>c.fbName===name);if(idx>-1)ALL.splice(idx,1);
+  DUPES=findDupes(ALL);
+  document.getElementById('tc-dupes').textContent=DUPES.length;
+  renderDupes();renderCleanup();
+  showToast('🗑 Deleting '+name+'…');
+  try{const r=await gas('deleteClient',{fbName:name});showToast(r.ok?'✅ Deleted: '+name:'⚠ Local only — '+(r.error||'error'));}
+  catch(e){showToast('⚠ Deleted locally — offline');}
+}
+
+// ═══════════════════════════════════════
+//  PRE-APR 2026 TAB
+// ═══════════════════════════════════════
+function filterOld(){
+  const q=(document.getElementById('qo')?.value||'').toLowerCase().trim();
+  const f=document.getElementById('of')?.value||'all';
+  let list=OLD;
+  if(f==='no-email')list=list.filter(c=>!c.email);
+  if(f==='no-contact')list=list.filter(c=>!c.email&&!c.phone);
+  if(f==='has-email')list=list.filter(c=>!!c.email);
+  if(q)list=list.filter(c=>c._srch.indexOf(q)!==-1);
+  list=[...list].sort((a,b)=>b._spent-a._spent);
+  document.getElementById('cnt-o').textContent=list.length+' clients';
+  document.getElementById('old-wrap').innerHTML='<table><thead><tr><th>Client</th><th>Added</th><th>Email</th><th class="hm">Phone</th><th class="hm">Sessions</th><th class="hm">Spent</th><th>Action</th></tr></thead><tbody>'+
+    list.slice(0,300).map(c=>'<tr>'+
+      '<td><div class="nc">'+
+        '<div class="av" style="background:'+(c._inSheet?'var(--muted)':'var(--danger)')+';font-size:9px;">'+initials(c.fbName)+'</div>'+
+        '<div><div class="nm">'+esc(c.fbName)+'</div>'+(!c._inSheet?'<div style="font-size:9px;color:var(--danger);">not in sheet</div>':'')+'</div>'+
+      '</div></td>'+
+      '<td style="font-size:10px;color:var(--muted);">'+(c.added||'—').slice(0,10)+'</td>'+
+      '<td>'+(c.email?'<span class="ok-b">'+c.email.slice(0,22)+'</span>':'<span class="miss">missing</span>')+'</td>'+
+      '<td class="hm">'+(c.phone?'<span class="ok-b">'+c.phone+'</span>':'<span class="miss">missing</span>')+'</td>'+
+      '<td class="hm">'+c._sessions+'</td>'+
+      '<td class="hm">'+(c._spent>0?'₱'+fmt(c._spent):'—')+'</td>'+
+      '<td><button class="btn btn-t btn-sm" onclick="openEM(\''+esc(c.fbName)+'\')">✏ Edit</button></td>'+
+    '</tr>').join('')+'</tbody></table>';
+}
+function exportMissingCSV(){dlCSV(MISS,'cls_missing_info.csv');}
+function exportOldCSV(){dlCSV(OLD,'cls_pre_apr2026_clients.csv');}
 function dlCSV(list,fname){
   const rows=[['Name','Email','Phone','Birthday','Type','Added','SM Consent','Referred By','Sessions','Spent','Staff Notes']];
   list.forEach(c=>rows.push([c.fbName,c.email||'',c.phone||'',c.birthday||'',c.type||'',c.added||'',c.socialConsent||'',c.referredBy||'',c._sessions||0,c._spent||0,c.staffNotes||'']));
   const csv=rows.map(r=>r.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(',')).join('\n');
   const a=document.createElement('a');a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);a.download=fname;a.click();
 }
-async function importUpdatedCSV(input){
+async function importCSV(input){
   const file=input.files[0];if(!file)return;
   const text=await file.text();
-  const rows=text.split('\n').map(r=>r.split(',').map(v=>v.replace(/^"|"$/g,'').trim()));
-  const hdr=rows[0].map(h=>h.toLowerCase());
-  const nameIdx=hdr.indexOf('name'),emailIdx=hdr.indexOf('email'),phoneIdx=hdr.indexOf('phone'),bdayIdx=hdr.indexOf('birthday'),smcIdx=hdr.indexOf('sm consent');
+  const rows=text.split('\n').map(r=>{const cells=[];let cur='',inQ=false;for(let ch of r){if(ch==='"'){inQ=!inQ;}else if(ch===','&&!inQ){cells.push(cur.trim());cur='';}else cur+=ch;}cells.push(cur.trim());return cells;});
+  const hdr=rows[0].map(h=>h.toLowerCase().replace(/"/g,''));
+  const ni=hdr.indexOf('name'),ei=hdr.indexOf('email'),pi=hdr.indexOf('phone'),bi=hdr.indexOf('birthday'),si=hdr.indexOf('sm consent');
   let updated=0;
   for(let i=1;i<rows.length;i++){
-    const row=rows[i];const name=row[nameIdx];if(!name)continue;
-    const payload={fbName:name,email:row[emailIdx]||'',phone:row[phoneIdx]||'',birthday:row[bdayIdx]||'',socialConsent:row[smcIdx]||''};
-    const c=ALL.find(x=>x.fbName.toLowerCase()===name.toLowerCase());
-    if(c)Object.assign(c,payload);
+    const row=rows[i];const name=(row[ni]||'').replace(/^"|"$/g,'');if(!name)continue;
+    const payload={fbName:name,email:(row[ei]||'').replace(/^"|"$/g,''),phone:(row[pi]||'').replace(/^"|"$/g,''),birthday:(row[bi]||'').replace(/^"|"$/g,''),socialConsent:(row[si]||'').replace(/^"|"$/g,'')};
+    const c=ALL.find(x=>x.fbName.toLowerCase()===name.toLowerCase());if(c)Object.assign(c,payload);
     try{await gas('saveClient',payload);updated++;}catch(e){}
   }
   showToast('✅ Updated '+updated+' clients');
-  renderMissing();renderOld();
-  input.value='';
+  filterMissing();filterOld();input.value='';
 }
 function campaign(){
-  const clients=FILT.filter(c=>c.email);
-  if(!clients.length){showToast('No clients with email in current view.');return;}
-  window.open('https://mail.google.com/mail/u/0/?view=cm&fs=1&bcc='+encodeURIComponent(clients.map(c=>c.email).join(','))+'&su='+encodeURIComponent('Special Offer from Click Lounge Studio!'),'_blank');
+  const list=FILT.filter(c=>c.email);
+  if(!list.length){showToast('No clients with email in current view.');return;}
+  window.open('https://mail.google.com/mail/u/0/?view=cm&fs=1&bcc='+encodeURIComponent(list.map(c=>c.email).join(','))+'&su='+encodeURIComponent('Special Offer from Click Lounge Studio!'),'_blank');
 }
 
-// ═══ TABS ═══
+// ═══════════════════════════════════════
+//  TABS
+// ═══════════════════════════════════════
 function showTab(id){
   ['crm','cleanup','missing','dupes','oldimport'].forEach(t=>{
     document.getElementById('panel-'+t).style.display=t===id?'':'none';
@@ -702,15 +886,16 @@ function showTab(id){
   });
 }
 
-// ═══ UTILS ═══
-function showToast(msg){const b=document.getElementById('ss');b.textContent=msg;setTimeout(()=>{b.textContent='';},4000);}
+// ═══════════════════════════════════════
+//  UTILS
+// ═══════════════════════════════════════
+function showToast(msg){const b=document.getElementById('ss');b.textContent=msg;setTimeout(()=>{if(b.textContent===msg)b.textContent='';},5000);}
 function initials(n){return(n||'').split(' ').map(w=>w[0]||'').join('').slice(0,2).toUpperCase();}
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 function fmt(n){return Number(n||0).toLocaleString('en-PH',{maximumFractionDigits:0});}
-function todayStr(){return new Date().toLocaleDateString('en-CA',{timeZone:'Asia/Manila'});}
-function dateOffset(days){const d=new Date();d.setDate(d.getDate()+days);return d.toLocaleDateString('en-CA',{timeZone:'Asia/Manila'});}
-function tierColor(t){return t==='Gold VIP'?'#b8860b':t==='Silver'?'#5b63d9':t==='Bronze'?'#d79068':'var(--muted)';}
-function rfmColor(r){return r>=12?{c:'var(--success)',bg:'rgba(58,125,92,.1)'}:r>=9?{c:'var(--teal)',bg:'rgba(81,137,125,.1)'}:r>=6?{c:'var(--gold)',bg:'rgba(215,144,104,.1)'}:{c:'var(--danger)',bg:'rgba(192,84,74,.08)'};}
+function dOffset(days){const d=new Date();d.setDate(d.getDate()+days);return d.toLocaleDateString('en-CA',{timeZone:'Asia/Manila'});}
+function tierCol(t){return t==='Gold VIP'?'#b8860b':t==='Silver'?'#5b63d9':t==='Bronze'?'#d79068':'var(--muted)';}
+function rfmCol(r){return r>=12?{c:'var(--success)',bg:'rgba(58,125,92,.1)'}:r>=9?{c:'var(--teal)',bg:'rgba(81,137,125,.1)'}:r>=6?{c:'var(--gold)',bg:'rgba(215,144,104,.1)'}:{c:'var(--danger)',bg:'rgba(192,84,74,.08)'};}
 
 doSync();
 </script>
