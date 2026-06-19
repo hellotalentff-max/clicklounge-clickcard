@@ -167,7 +167,10 @@ tr:hover td{background:rgba(81,137,125,.025);cursor:pointer;}
 
   <!-- ═══ DUPLICATES TAB ═══ -->
   <div id="panel-dupes" style="display:none;">
-    <p style="font-size:12px;color:var(--muted);margin-bottom:14px;line-height:1.6;">These clients appear to be duplicates based on similar names or same email. Review and flag the record to keep.</p>
+    <div class="dup-card" style="margin-bottom:14px;border-color:rgba(192,84,74,.2);background:rgba(192,84,74,.02);">
+      <div style="font-size:12px;font-weight:700;color:var(--slate);margin-bottom:4px;">🔁 How to resolve duplicates</div>
+      <p style="font-size:11px;color:var(--muted);line-height:1.6;">Each group below shows clients that may be the same person. <strong>Keep</strong> the most complete record (has email, more sessions, more spent). <strong>Delete</strong> the other. Deleting removes the record from the Clients sheet only — their Transactions and Registrations history stays intact.</p>
+    </div>
     <div id="dupes-wrap"></div>
   </div>
 
@@ -505,16 +508,86 @@ function filterMissing(){
 
 // ═══ DUPLICATES TAB ═══
 function renderDupes(){
-  if(!DUPES.length){document.getElementById('dupes-wrap').innerHTML='<div class="loading">✅ No duplicates detected.</div>';return;}
-  document.getElementById('dupes-wrap').innerHTML=DUPES.map((g,gi)=>
-    '<div class="dup-group"><div style="font-size:11px;font-weight:700;color:var(--danger);margin-bottom:8px;">⚠ '+g.reason+'</div>'+
-    g.clients.map(c=>'<div class="dup-row">'+
-      '<div class="av" style="background:var(--muted);font-size:9px;width:24px;height:24px;">'+initials(c.fbName)+'</div>'+
-      '<div style="flex:1;"><div class="nm">'+esc(c.fbName)+'</div><div class="em">'+(c.email||'No email')+' · '+(c.phone||'No phone')+'</div></div>'+
-      '<div style="font-size:10px;color:var(--muted);">'+c._sessions+' sessions · '+fmt(c._spent)+'</div>'+
-      '<button class="btn btn-t btn-sm" onclick="openEdit(\''+esc(c.fbName)+'\')">Edit</button>'+
-    '</div>').join('')+'</div>'
-  ).join('');
+  const el = document.getElementById('dupes-wrap');
+  if(!DUPES.length){
+    el.innerHTML='<div class="loading" style="color:var(--success);">✅ No duplicates detected.</div>';
+    return;
+  }
+  el.innerHTML = DUPES.map((g,gi)=>{
+    // Sort clients in group: most complete first (has email, most sessions, most spent)
+    const sorted = [...g.clients].sort((a,b)=>{
+      const scoreA = (a.email?3:0)+(a.phone?2:0)+(a.birthday?1:0)+(a._sessions*0.1)+(a._spent*0.001);
+      const scoreB = (b.email?3:0)+(b.phone?2:0)+(b.birthday?1:0)+(b._sessions*0.1)+(b._spent*0.001);
+      return scoreB - scoreA;
+    });
+    const recommended = sorted[0]; // best record to keep
+
+    return '<div class="dup-group" id="dg-'+gi+'">'+
+      '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">'+
+        '<div style="font-size:11px;font-weight:700;color:var(--danger);">⚠ '+g.reason+'</div>'+
+        '<div style="font-size:10px;color:var(--muted);">Recommended to keep: <strong style="color:var(--teal);">'+esc(recommended.fbName)+'</strong></div>'+
+      '</div>'+
+      sorted.map((c,ci)=>{
+        const isKeep = ci === 0;
+        const missing = [];
+        if(!c.email) missing.push('no email');
+        if(!c.phone) missing.push('no phone');
+        if(!c.birthday) missing.push('no bday');
+        return '<div class="dup-row" style="'+(isKeep?'background:rgba(81,137,125,.04);border-radius:8px;padding:8px 10px;':'')+' flex-wrap:wrap;gap:8px;">'+
+          '<div class="av" style="background:'+(isKeep?'var(--teal)':'var(--muted)')+';font-size:9px;width:28px;height:28px;">'+initials(c.fbName)+'</div>'+
+          '<div style="flex:1;min-width:150px;">'+
+            '<div style="display:flex;align-items:center;gap:6px;">'+
+              '<span class="nm">'+esc(c.fbName)+'</span>'+
+              (isKeep?'<span style="font-size:9px;background:rgba(81,137,125,.1);color:var(--teal);padding:1px 6px;border-radius:4px;font-weight:700;">✓ KEEP</span>':'')+
+            '</div>'+
+            '<div class="em">'+
+              (c.email?c.email:'<span style="color:var(--danger);">no email</span>')+
+              ' · '+(c.phone?c.phone:'no phone')+
+              ' · '+c._sessions+' sessions · ₱'+fmt(c._spent)+
+            '</div>'+
+          '</div>'+
+          '<div style="display:flex;gap:6px;align-items:center;flex-shrink:0;">'+
+            '<button class="btn btn-t btn-sm" onclick="openEdit(\''+esc(c.fbName)+'\')">✏ Edit</button>'+
+            (!isKeep && c._inSheet ?
+              '<button class="btn btn-d btn-sm" onclick="deleteDupe(\''+esc(c.fbName)+'\','+gi+')">🗑 Delete</button>' :
+              (!c._inSheet ? '<span style="font-size:10px;color:var(--muted);">not in sheet</span>' : '')
+            )+
+          '</div>'+
+        '</div>';
+      }).join('')+
+    '</div>';
+  }).join('');
+}
+
+async function deleteDupe(name, groupIdx){
+  const confirmed = confirm(
+    'Delete "'+name+'" from the Clients sheet?\n\n'+
+    '✅ Their transaction history stays intact\n'+
+    '✅ Their registration history stays intact\n'+
+    '❌ Their client record (name, email, phone, birthday) will be removed\n\n'+
+    'Only delete if this is a duplicate of another client.'
+  );
+  if(!confirmed) return;
+
+  // Remove from local ALL array
+  const idx = ALL.findIndex(c => c.fbName === name);
+  if(idx > -1) ALL.splice(idx, 1);
+
+  // Re-detect duplicates
+  DUPES = findDuplicates(ALL);
+  document.getElementById('tc-dupes').textContent = DUPES.length;
+  renderDupes();
+  renderCleanup();
+
+  // Push delete to GAS
+  showToast('🗑 Deleting '+name+'…');
+  try{
+    const r = await gas('deleteClient', {fbName: name});
+    if(r.ok) showToast('✅ Deleted: '+name);
+    else showToast('⚠ Local only — GAS: '+(r.error||'error'));
+  }catch(e){
+    showToast('⚠ Deleted locally — offline');
+  }
 }
 
 // ═══ PRE-APR 2026 TAB ═══
