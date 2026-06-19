@@ -40,7 +40,7 @@ input,select,button,textarea{font-family:inherit;}
 
 /* Table */
 table{width:100%;border-collapse:separate;border-spacing:0;background:var(--white);border-radius:12px;overflow:hidden;border:1px solid var(--border);}
-thead th{padding:8px 12px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);background:var(--light);text-align:left;border-bottom:1px solid var(--border);position:sticky;top:48px;z-index:10;}
+thead th{padding:8px 12px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);background:var(--light);text-align:left;border-bottom:1px solid var(--border);}
 tbody tr{cursor:pointer;transition:background .1s;}
 tbody tr:hover{background:rgba(81,137,125,.03);}
 tbody td{padding:8px 12px;font-size:12px;border-bottom:1px solid var(--light2);}
@@ -81,6 +81,7 @@ tbody tr:last-child td{border-bottom:none;}
   <div class="right">
     <span class="badge" id="ss"></span>
     <button class="btn" onclick="sync()" id="sb">🔄 Sync</button>
+    <button class="btn" onclick="syncMissing()" title="Find clients in Transactions/Bookings not yet in Clients sheet">🔍 Find Missing</button>
     <button class="btn btn-g" onclick="campaign()">✉ Campaign</button>
   </div>
 </div>
@@ -157,8 +158,47 @@ async function sync(){
 }
 
 // ═══ PROCESS ═══
+async function syncMissing(){
+  const st=document.getElementById('ss');
+  st.textContent='🔍 Finding missing clients…';
+  try{
+    const r=await gas('syncClients');
+    if(r.ok) st.textContent='✅ '+(r.message||r.added+' added');
+    else st.textContent='⚠ '+(r.error||'Error');
+    await sync(); // re-sync to pick up new records
+  }catch(e){st.textContent='❌ '+e.message;}
+}
+
 function process(d){
   const clients=d.clients||[],txns=(d.transactions||[]).filter(t=>!String(t.invoiceNum||'').startsWith('[VOID]')),regs=d.registrations||[],pa=d.pointsActivity||[],acks=d.acknowledgements||[];
+
+  // ── Merge: find names in txns/regs/acks not in Clients sheet ──
+  const knownNames=new Set(clients.map(c=>(c.fbName||'').toLowerCase().trim()));
+  const extraClients=[];
+
+  regs.forEach(r=>{
+    const n=(r.fbName||'').trim();
+    if(n && !knownNames.has(n.toLowerCase())){
+      knownNames.add(n.toLowerCase());
+      extraClients.push({fbName:n,email:r.email||'',phone:'',birthday:'',type:'walkin',added:r.date||'',socialConsent:'',referredBy:'',notes:'',staffNotes:'',points:''});
+    }
+  });
+  txns.forEach(t=>{
+    const n=(t.clientName||'').trim();
+    if(n && !knownNames.has(n.toLowerCase())){
+      knownNames.add(n.toLowerCase());
+      extraClients.push({fbName:n,email:'',phone:'',birthday:'',type:'walkin',added:t.date||'',socialConsent:'',referredBy:'',notes:'',staffNotes:'',points:''});
+    }
+  });
+  acks.forEach(a=>{
+    const n=(a.fbName||'').trim();
+    if(n && !knownNames.has(n.toLowerCase())){
+      knownNames.add(n.toLowerCase());
+      extraClients.push({fbName:n,email:a.email||'',phone:'',birthday:'',type:'booked',added:a.date||a.bookDate||'',socialConsent:'',referredBy:'',notes:'',staffNotes:'',points:''});
+    }
+  });
+
+  const allClients=[...clients,...extraClients];
 
   // Lookup maps (single pass each)
   const regC={},lastV={},txnS={},txnC={},hasSess={};
@@ -173,7 +213,7 @@ function process(d){
   const d60=new Date(now);d60.setDate(d60.getDate()-60);const cut60=d60.toISOString().slice(0,10);
   const d120=new Date(now);d120.setDate(d120.getDate()-120);const cut120=d120.toISOString().slice(0,10);
 
-  ALL=clients.map(c=>{
+  ALL=allClients.map(c=>{
     const nL=(c.fbName||'').toLowerCase();
     const sessions=regC[nL]||0, spent=txnS[nL]||0, invoices=txnC[nL]||0;
     const lastVisit=lastV[nL]||'';
