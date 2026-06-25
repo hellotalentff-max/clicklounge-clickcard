@@ -143,6 +143,7 @@ tr.cl-row:hover td{background:rgba(81,137,125,.03);}
 <!-- ── Tabs ── -->
 <div class="tabs">
   <button class="tab on" onclick="showTab('crm')" id="t-crm">👥 CRM <span class="tc" id="tc-crm">0</span></button>
+  <button class="tab" onclick="showTab('emails')" id="t-emails">✉ Emails <span class="tc" id="tc-emails">0</span></button>
   <button class="tab" onclick="showTab('cleanup')" id="t-cleanup">🔧 Data Cleanup <span class="tc warn" id="tc-cleanup">0</span></button>
   <button class="tab" onclick="showTab('missing')" id="t-missing">🕳 Missing Info <span class="tc warn" id="tc-missing">0</span></button>
   <button class="tab" onclick="showTab('dupes')" id="t-dupes">🔁 Duplicates <span class="tc warn" id="tc-dupes">0</span></button>
@@ -180,6 +181,132 @@ tr.cl-row:hover td{background:rgba(81,137,125,.03);}
     <div id="lm" style="display:none;text-align:center;padding:12px;">
       <button class="btn btn-t" onclick="loadMore()">Load More</button>
       <span class="cnt-b" id="lmc" style="margin-left:8px;"></span>
+    </div>
+  </div>
+
+  <!-- ════ EMAILS TAB ════ -->
+  <div id="panel-emails" style="display:none;">
+    <div style="display:grid;grid-template-columns:1fr;gap:14px;" id="em-layout">
+
+      <!-- Inner toolbar -->
+      <div style="background:var(--white);border-radius:12px;padding:12px 16px;border:1px solid var(--border);display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+        <button class="tab on" onclick="emShowSub('compose')" id="em-sub-compose" style="border-bottom:none;padding:6px 12px;">✉ Compose & Send</button>
+        <button class="tab" onclick="emShowSub('history')" id="em-sub-history" style="border-bottom:none;padding:6px 12px;">📋 Send History</button>
+        <div style="flex:1;"></div>
+        <span id="em-status" style="font-size:10px;color:var(--muted);"></span>
+      </div>
+
+      <!-- COMPOSE SUB-VIEW -->
+      <div id="em-sub-view-compose">
+        <div style="display:grid;grid-template-columns:240px 1fr;gap:14px;" id="em-grid">
+
+          <!-- Templates list -->
+          <div style="background:var(--white);border-radius:12px;padding:10px 0;border:1px solid var(--border);align-self:start;">
+            <div style="padding:6px 14px 8px;font-size:10px;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);font-weight:700;">Templates</div>
+            <div id="em-tpl-list">
+              <div style="padding:14px;font-size:11px;color:var(--muted);">Loading…</div>
+            </div>
+          </div>
+
+          <!-- Right pane -->
+          <div>
+
+            <div id="em-empty-state" style="background:var(--white);border-radius:12px;padding:40px 20px;text-align:center;color:var(--muted);font-size:12px;border:1px solid var(--border);">
+              ← Pick a template from the left to begin
+            </div>
+
+            <div id="em-config" style="display:none;">
+
+              <!-- Selected template card -->
+              <div style="background:var(--white);border-radius:12px;padding:14px 16px;margin-bottom:12px;border:1px solid var(--border);">
+                <div style="font-size:14px;font-weight:700;color:var(--slate);margin-bottom:4px;" id="em-tpl-title"></div>
+                <div style="font-size:11px;color:var(--muted);" id="em-tpl-subject"></div>
+              </div>
+
+              <!-- Recipients (uses ALL[] from CRM data — instant filtering) -->
+              <div style="background:var(--white);border-radius:12px;padding:14px 16px;margin-bottom:12px;border:1px solid var(--border);">
+                <div style="font-size:11px;font-weight:700;color:var(--slate);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px;">👥 Recipients</div>
+
+                <!-- Smart filters using lifecycle stages & RFM data -->
+                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:6px;margin-bottom:10px;">
+                  <select id="em-filter-stage" class="sel" onchange="emRecalcRecipients()" style="padding:7px 10px;border:1.5px solid var(--border);border-radius:6px;font-size:11px;background:var(--white);">
+                    <option value="all">All lifecycle stages</option>
+                    <option value="lead">🌱 Leads</option>
+                    <option value="booked">📅 Booked (not visited)</option>
+                    <option value="active">✨ Active</option>
+                    <option value="loyal">💎 Loyal (3+ visits)</option>
+                    <option value="vip">⭐ VIP (5+ visits / ₱10k+)</option>
+                    <option value="atrisk">⚠ At Risk (60-120d)</option>
+                    <option value="dormant">😴 Dormant (120d+)</option>
+                  </select>
+                  <select id="em-filter-tier" class="sel" onchange="emRecalcRecipients()" style="padding:7px 10px;border:1.5px solid var(--border);border-radius:6px;font-size:11px;background:var(--white);">
+                    <option value="all">All tiers</option>
+                    <option value="Gold VIP">🥇 Gold VIP only</option>
+                    <option value="Silver">🥈 Silver only</option>
+                    <option value="Bronze">🥉 Bronze only</option>
+                    <option value="New">🌱 New only</option>
+                  </select>
+                  <select id="em-filter-extra" class="sel" onchange="emRecalcRecipients()" style="padding:7px 10px;border:1.5px solid var(--border);border-radius:6px;font-size:11px;background:var(--white);">
+                    <option value="">No additional filter</option>
+                    <option value="birthday_month">🎂 Birthday this month</option>
+                    <option value="has_email">📧 Has email only</option>
+                    <option value="rfm_high">⭐ Best clients (RFM 12+)</option>
+                    <option value="one">📧 Just one specific client</option>
+                  </select>
+                </div>
+
+                <div id="em-single-field" style="display:none;margin-bottom:10px;">
+                  <input type="text" id="em-single-client" placeholder="Client email or FB Name" style="width:100%;padding:8px 12px;border:1.5px solid var(--border);border-radius:6px;font-size:12px;">
+                </div>
+
+                <div id="em-recip-summary" style="font-size:12px;font-weight:700;color:var(--teal);margin-bottom:8px;"></div>
+                <div id="em-recip-list" style="max-height:180px;overflow-y:auto;border:1px solid var(--border);border-radius:6px;display:none;"></div>
+              </div>
+
+              <!-- Custom values -->
+              <div style="background:var(--white);border-radius:12px;padding:14px 16px;margin-bottom:12px;border:1px solid var(--border);" id="em-vars-card">
+                <div style="font-size:11px;font-weight:700;color:var(--slate);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;">🔧 Campaign Values</div>
+                <div style="font-size:10px;color:var(--muted);margin-bottom:10px;line-height:1.5;">Client data (name, points, tier, last visit) auto-fills from the CRM. Fill any campaign-specific values below.</div>
+                <div id="em-vars-form"></div>
+              </div>
+
+              <!-- Preview -->
+              <div style="background:var(--white);border-radius:12px;padding:14px 16px;margin-bottom:12px;border:1px solid var(--border);">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:6px;">
+                  <div style="font-size:11px;font-weight:700;color:var(--slate);text-transform:uppercase;letter-spacing:.5px;">👁 Preview</div>
+                  <button class="btn btn-sm" onclick="emPreview()">🔄 Refresh</button>
+                </div>
+                <div style="font-size:11px;color:var(--muted);margin-bottom:8px;">Subject: <strong style="color:var(--slate);" id="em-preview-subj"></strong></div>
+                <div style="background:var(--light);border-radius:8px;overflow:hidden;border:1px solid var(--border);">
+                  <iframe id="em-preview-iframe" style="width:100%;height:460px;border:none;display:block;background:#fff;"></iframe>
+                </div>
+              </div>
+
+              <!-- Send -->
+              <div style="background:var(--white);border-radius:12px;padding:14px 16px;border:1px solid var(--border);">
+                <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+                  <button class="btn btn-t" onclick="emSendNow()" id="em-send-btn">🚀 Send Now</button>
+                  <button class="btn" onclick="emSendTest()">📧 Test Send</button>
+                  <div id="em-send-status" style="font-size:11px;color:var(--muted);flex:1;text-align:right;"></div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- HISTORY SUB-VIEW -->
+      <div id="em-sub-view-history" style="display:none;">
+        <div style="background:var(--white);border-radius:12px;padding:14px 16px;border:1px solid var(--border);">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px;">
+            <div style="font-size:13px;font-weight:700;color:var(--slate);">Recent Email Sends</div>
+            <button class="btn btn-sm" onclick="emLoadHistory()">🔄 Refresh</button>
+          </div>
+          <div id="em-history-content" style="font-size:12px;color:var(--muted);">Click Refresh to load history.</div>
+        </div>
+      </div>
+
     </div>
   </div>
 
@@ -425,6 +552,7 @@ function processData(d){
 
   // Tab counts
   document.getElementById('tc-crm').textContent=ALL.length;
+  document.getElementById('tc-emails').textContent=ALL.filter(c=>c.email && c.email.indexOf('@')>-1).length;
   document.getElementById('tc-cleanup').textContent=ALL.filter(c=>!c.email).length;
   document.getElementById('tc-missing').textContent=MISS.length;
   document.getElementById('tc-dupes').textContent=DUPES.length;
@@ -880,10 +1008,11 @@ function campaign(){
 //  TABS
 // ═══════════════════════════════════════
 function showTab(id){
-  ['crm','cleanup','missing','dupes','oldimport'].forEach(t=>{
+  ['crm','emails','cleanup','missing','dupes','oldimport'].forEach(t=>{
     document.getElementById('panel-'+t).style.display=t===id?'':'none';
     document.getElementById('t-'+t).classList.toggle('on',t===id);
   });
+  if(id==='emails' && !EM_INITIALIZED) emInit();
 }
 
 // ═══════════════════════════════════════
@@ -896,6 +1025,262 @@ function fmt(n){return Number(n||0).toLocaleString('en-PH',{maximumFractionDigit
 function dOffset(days){const d=new Date();d.setDate(d.getDate()+days);return d.toLocaleDateString('en-CA',{timeZone:'Asia/Manila'});}
 function tierCol(t){return t==='Gold VIP'?'#b8860b':t==='Silver'?'#5b63d9':t==='Bronze'?'#d79068':'var(--muted)';}
 function rfmCol(r){return r>=12?{c:'var(--success)',bg:'rgba(58,125,92,.1)'}:r>=9?{c:'var(--teal)',bg:'rgba(81,137,125,.1)'}:r>=6?{c:'var(--gold)',bg:'rgba(215,144,104,.1)'}:{c:'var(--danger)',bg:'rgba(192,84,74,.08)'};}
+
+// ═══════════════════════════════════════════════════════════════════
+//  ✉ EMAIL CENTER — Integrated into the ClickCard CRM
+// ═══════════════════════════════════════════════════════════════════
+let EM_TEMPLATES=[], EM_SELECTED=null, EM_INITIALIZED=false, EM_RECIPIENTS=[];
+
+async function emInit(){
+  if(EM_INITIALIZED) return;
+  EM_INITIALIZED = true;
+  document.getElementById('em-status').textContent='Loading templates…';
+  try{
+    const r = await gas('getEmailTemplates');
+    if(!r.ok) throw new Error(r.error || 'Failed to load templates');
+    EM_TEMPLATES = r.templates || [];
+    document.getElementById('em-status').textContent = EM_TEMPLATES.length + ' templates · ' + ALL.filter(c=>c.email && c.email.indexOf('@')>-1).length + ' clients reachable';
+    emRenderTemplateList();
+  }catch(e){
+    document.getElementById('em-tpl-list').innerHTML='<div style="padding:14px;font-size:11px;color:var(--danger);line-height:1.6;">⚠ '+e.message+'<br><br>The email engine isn\'t installed yet. Add <code style="background:var(--light);padding:1px 4px;border-radius:3px;">email_engine.gs</code> to your Apps Script and wire the router.</div>';
+    document.getElementById('em-status').textContent='⚠ Engine not connected';
+  }
+}
+
+function emShowSub(view){
+  document.getElementById('em-sub-compose').classList.toggle('on', view==='compose');
+  document.getElementById('em-sub-history').classList.toggle('on', view==='history');
+  document.getElementById('em-sub-view-compose').style.display = view==='compose' ? '' : 'none';
+  document.getElementById('em-sub-view-history').style.display = view==='history' ? '' : 'none';
+  if(view==='history') emLoadHistory();
+}
+
+function emRenderTemplateList(){
+  const html = EM_TEMPLATES.map(t =>
+    '<div class="em-tpl-item" data-em-key="'+t.key+'" onclick="emSelect(\''+t.key+'\')" style="padding:10px 14px;cursor:pointer;font-size:12px;font-weight:500;color:var(--slate);border-left:3px solid transparent;display:flex;align-items:center;gap:8px;transition:all .12s;">' +
+      '<span style="font-size:16px;">'+t.icon+'</span><div>'+t.title+'</div>' +
+    '</div>'
+  ).join('');
+  document.getElementById('em-tpl-list').innerHTML = html || '<div style="padding:14px;font-size:11px;color:var(--muted);">No templates.</div>';
+}
+
+function emSelect(key){
+  EM_SELECTED = EM_TEMPLATES.find(t => t.key === key);
+  if(!EM_SELECTED) return;
+  document.querySelectorAll('.em-tpl-item').forEach(el => {
+    const active = el.dataset.emKey === key;
+    el.style.borderLeftColor = active ? 'var(--teal)' : 'transparent';
+    el.style.background = active ? 'rgba(81,137,125,.06)' : '';
+    el.style.color = active ? 'var(--teal)' : 'var(--slate)';
+    el.style.fontWeight = active ? '700' : '500';
+  });
+  document.getElementById('em-empty-state').style.display='none';
+  document.getElementById('em-config').style.display='';
+  document.getElementById('em-tpl-title').textContent = EM_SELECTED.icon+' '+EM_SELECTED.title;
+  document.getElementById('em-tpl-subject').textContent = 'Subject: '+EM_SELECTED.subject;
+  emRenderVarsForm();
+  emRecalcRecipients();
+  emPreview();
+}
+
+function emRenderVarsForm(){
+  const auto = ['firstName','currentPoints','tier','pointsToNextTier','nextTierName','availablePerks',
+                'lastVisitDate','monthsSinceLastVisit','lastPackage','birthdayMonth','expiringPoints',
+                'newPointsBalance','fullName'];
+  const custom = (EM_SELECTED.variables || []).filter(v => auto.indexOf(v) === -1);
+  if(!custom.length){
+    document.getElementById('em-vars-form').innerHTML='<div style="font-size:11px;color:var(--muted);font-style:italic;">No campaign-specific values needed — everything is pulled from CRM data.</div>';
+    return;
+  }
+  const html = custom.map(v =>
+    '<div style="display:grid;grid-template-columns:150px 1fr;gap:8px;align-items:center;margin-bottom:6px;">' +
+      '<label style="font-size:10px;font-family:Courier,monospace;color:var(--muted);">{{'+v+'}}</label>' +
+      '<input type="text" data-em-var="'+v+'" oninput="emPreview()" placeholder="enter value..." style="padding:6px 9px;border:1.5px solid var(--border);border-radius:5px;font-size:11px;font-family:inherit;">' +
+    '</div>'
+  ).join('');
+  document.getElementById('em-vars-form').innerHTML = html;
+}
+
+function emGetExtras(){
+  const extras = {};
+  document.querySelectorAll('[data-em-var]').forEach(el => {
+    if(el.value.trim()) extras[el.dataset.emVar] = el.value.trim();
+  });
+  return extras;
+}
+
+function emRecalcRecipients(){
+  const stage = document.getElementById('em-filter-stage').value;
+  const tier  = document.getElementById('em-filter-tier').value;
+  const extra = document.getElementById('em-filter-extra').value;
+
+  document.getElementById('em-single-field').style.display = extra==='one' ? '' : 'none';
+
+  if(extra==='one'){
+    EM_RECIPIENTS = [];
+    document.getElementById('em-recip-summary').textContent = '📧 Sending to one specific client';
+    document.getElementById('em-recip-list').style.display='none';
+    return;
+  }
+
+  const now = new Date();
+  const curMonth = now.getMonth() + 1;
+
+  EM_RECIPIENTS = (ALL || []).filter(c => {
+    if(!c.email || c.email.indexOf('@')===-1) return false;
+    if(stage !== 'all' && c._stage !== stage) return false;
+    if(tier !== 'all' && c._tier !== tier) return false;
+    if(extra === 'birthday_month'){
+      if(!c.birthday) return false;
+      const bd = new Date(c.birthday);
+      if(isNaN(bd.getTime())) return false;
+      if((bd.getMonth()+1) !== curMonth) return false;
+    }
+    if(extra === 'rfm_high' && (!c._rfm || c._rfm < 12)) return false;
+    return true;
+  });
+
+  const n = EM_RECIPIENTS.length;
+  document.getElementById('em-recip-summary').textContent = '👥 ' + n + ' recipient' + (n!==1?'s':'') + ' match';
+
+  if(n){
+    const listHtml = EM_RECIPIENTS.slice(0, 50).map(c => {
+      const tierC = tierCol(c._tier);
+      return '<div style="padding:7px 11px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;font-size:11px;">' +
+        '<div><strong>'+esc(c.fbName||'(no name)')+'</strong><br><span style="color:var(--muted);font-size:10px;">'+esc(c.email)+'</span></div>' +
+        '<div style="text-align:right;font-size:10px;">' +
+          '<span style="color:'+tierC+';font-weight:700;">'+esc(c._tier||'New')+'</span><br>' +
+          '<span style="color:var(--muted);">'+c._pts+'pts · '+c._sessions+' visits</span>' +
+        '</div>' +
+      '</div>';
+    }).join('');
+    const more = EM_RECIPIENTS.length>50 ? '<div style="padding:8px 12px;font-style:italic;color:var(--muted);font-size:10px;text-align:center;">… and '+(EM_RECIPIENTS.length-50)+' more</div>' : '';
+    document.getElementById('em-recip-list').innerHTML = listHtml + more;
+    document.getElementById('em-recip-list').style.display = '';
+  } else {
+    document.getElementById('em-recip-list').style.display = 'none';
+  }
+}
+
+async function emPreview(){
+  if(!EM_SELECTED) return;
+  let clientId = '';
+  const extra = document.getElementById('em-filter-extra').value;
+  if(extra === 'one'){
+    clientId = (document.getElementById('em-single-client').value || '').trim();
+  } else if(EM_RECIPIENTS.length){
+    clientId = EM_RECIPIENTS[0].fbName || EM_RECIPIENTS[0].email || '';
+  }
+  try{
+    const r = await gas('previewEmail', {
+      templateKey: EM_SELECTED.key,
+      clientId: clientId,
+      extras: emGetExtras()
+    });
+    if(!r.ok) throw new Error(r.error);
+    document.getElementById('em-preview-subj').textContent = r.subject;
+    const iframe = document.getElementById('em-preview-iframe');
+    const doc = iframe.contentDocument || iframe.contentWindow.document;
+    doc.open(); doc.write(r.html); doc.close();
+  }catch(e){
+    document.getElementById('em-preview-subj').textContent = '⚠ '+e.message;
+  }
+}
+
+async function emSendNow(){
+  if(!EM_SELECTED){ showToast('⚠ Pick a template first'); return; }
+  const extra = document.getElementById('em-filter-extra').value;
+  const btn = document.getElementById('em-send-btn');
+  const status = document.getElementById('em-send-status');
+  btn.disabled = true; btn.textContent='🚀 Sending…';
+  status.textContent = '';
+
+  try{
+    if(extra === 'one'){
+      const target = (document.getElementById('em-single-client').value || '').trim();
+      if(!target){ throw new Error('Enter a client email or FB Name'); }
+      const r = await gas('sendOneEmail', {
+        templateKey: EM_SELECTED.key,
+        clientId: target,
+        extras: emGetExtras(),
+        sentBy: 'CRM Admin'
+      });
+      if(!r.ok) throw new Error(r.error);
+      status.innerHTML = '<span style="color:var(--success);font-weight:700;">✓ Sent to '+r.sentTo+'</span>';
+      showToast('✅ Email sent to '+r.sentTo);
+    } else {
+      if(!EM_RECIPIENTS.length){ throw new Error('No recipients match the current filters'); }
+      if(!confirm('Send "'+EM_SELECTED.title+'" to '+EM_RECIPIENTS.length+' recipients?\n\nThis cannot be undone.')){
+        btn.disabled=false; btn.textContent='🚀 Send Now'; return;
+      }
+      let sent = 0, failed = 0;
+      for(const c of EM_RECIPIENTS){
+        try{
+          const r = await gas('sendOneEmail', {
+            templateKey: EM_SELECTED.key,
+            clientId: c.fbName || c.email,
+            extras: emGetExtras(),
+            sentBy: 'CRM Admin (bulk)'
+          });
+          if(r && r.ok) sent++; else failed++;
+        }catch(e){ failed++; }
+        status.innerHTML = '<span style="color:var(--teal);">Sending… '+(sent+failed)+' / '+EM_RECIPIENTS.length+'</span>';
+      }
+      status.innerHTML = '<span style="color:var(--success);font-weight:700;">✓ Sent '+sent+' of '+EM_RECIPIENTS.length+'</span>' + (failed ? ' <span style="color:var(--danger);">('+failed+' failed)</span>' : '');
+      showToast('✅ Sent '+sent+' email'+(sent!==1?'s':''));
+    }
+  }catch(e){
+    status.innerHTML = '<span style="color:var(--danger);">❌ '+e.message+'</span>';
+    showToast('❌ '+e.message);
+  }
+  btn.disabled = false; btn.textContent = '🚀 Send Now';
+}
+
+async function emSendTest(){
+  if(!EM_SELECTED){ showToast('⚠ Pick a template first'); return; }
+  const target = prompt('Send a test of this template to which client (email or FB Name)?', '');
+  if(!target) return;
+  try{
+    const r = await gas('sendOneEmail', {
+      templateKey: EM_SELECTED.key,
+      clientId: target,
+      extras: emGetExtras(),
+      sentBy: 'CRM test'
+    });
+    if(!r.ok) throw new Error(r.error);
+    showToast('✅ Test sent to '+r.sentTo);
+  }catch(e){ showToast('❌ '+e.message); }
+}
+
+async function emLoadHistory(){
+  const box = document.getElementById('em-history-content');
+  box.textContent = 'Loading…';
+  try{
+    const r = await gas('getEmailHistory', {limit: 100});
+    if(!r.ok) throw new Error(r.error);
+    if(!r.history.length){
+      box.innerHTML = '<div style="font-size:11px;color:var(--muted);text-align:center;padding:24px;">No emails sent yet.</div>';
+      return;
+    }
+    let html = '<div style="font-size:9px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;padding:8px 12px;display:grid;grid-template-columns:130px 1fr 110px 70px;gap:10px;border-bottom:2px solid var(--border);">' +
+      '<div>Sent At</div><div>Recipient · Subject</div><div>Template</div><div>Status</div></div>';
+    html += r.history.map(h => {
+      const ok = h.status === 'sent';
+      const statusC = ok ? 'var(--success)' : 'var(--danger)';
+      const statusIcon = ok ? '✓ sent' : '❌ failed';
+      const sentAt = h.sentAt ? String(h.sentAt).replace('T',' ').slice(0,16) : '';
+      return '<div style="padding:9px 12px;border-bottom:1px solid var(--border);display:grid;grid-template-columns:130px 1fr 110px 70px;gap:10px;align-items:center;font-size:11px;">' +
+        '<div style="color:var(--muted);">'+esc(sentAt)+'</div>' +
+        '<div><strong>'+esc(h.clientName||'(unknown)')+'</strong><br><span style="color:var(--muted);font-size:10px;">'+esc(h.email||'')+' · '+esc((h.subject||'').slice(0,55))+'</span></div>' +
+        '<div style="font-size:10px;color:var(--teal);">'+esc(h.template)+'</div>' +
+        '<div><span style="color:'+statusC+';font-weight:700;font-size:10px;">'+statusIcon+'</span></div>' +
+      '</div>';
+    }).join('');
+    box.innerHTML = html;
+  }catch(e){
+    box.innerHTML = '<div style="color:var(--danger);padding:14px;font-size:11px;">'+esc(e.message)+'</div>';
+  }
+}
 
 doSync();
 </script>
