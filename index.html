@@ -416,7 +416,66 @@ tr.cl-row:hover td{background:rgba(81,137,125,.03);}
         </select>
       </div>
       <div class="fg"><label class="fl">Staff Notes</label><textarea class="fi" id="ef-notes" rows="2" placeholder="Internal notes…"></textarea></div>
-      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:4px;">
+
+      <!-- ── ADD PAST VISIT SECTION ── -->
+      <div style="margin-top:14px;padding-top:14px;border-top:2px dashed var(--border);">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+          <div style="font-size:12px;font-weight:700;color:var(--slate);text-transform:uppercase;letter-spacing:.5px;">📅 Add Past Visit</div>
+          <button class="btn btn-sm" type="button" onclick="toggleVisitHistory()" id="ef-history-toggle" style="font-size:10px;">Show History</button>
+        </div>
+        <div style="font-size:10px;color:var(--muted);margin-bottom:10px;line-height:1.5;">Backfill an old session to compile the client's history. ClickCard points will auto-credit based on the amount paid (1 pt per ₱100).</div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;">
+          <div class="fg" style="margin-bottom:0;">
+            <label class="fl" style="font-size:10px;">Visit Date</label>
+            <input class="fi" id="ef-pv-date" type="date" style="font-size:12px;">
+          </div>
+          <div class="fg" style="margin-bottom:0;">
+            <label class="fl" style="font-size:10px;">Amount Paid (₱)</label>
+            <input class="fi" id="ef-pv-amount" type="number" min="0" step="1" placeholder="e.g. 800" style="font-size:12px;">
+          </div>
+        </div>
+        <div class="fg" style="margin-bottom:8px;">
+          <label class="fl" style="font-size:10px;">Package / Service</label>
+          <select class="fi" id="ef-pv-package" style="font-size:12px;">
+            <option value="">— Select package —</option>
+            <optgroup label="Self-Shoot">
+              <option value="Snapshot Selfie">Snapshot Selfie (₱500)</option>
+              <option value="Tribe Time">Tribe Time (₱800)</option>
+              <option value="Crowd Cam">Crowd Cam (₱1,000)</option>
+              <option value="Crew Captures">Crew Captures (₱1,200)</option>
+              <option value="Frenzy Snaps Birthday">Frenzy Snaps Birthday (₱700)</option>
+              <option value="Party Clicks Birthday">Party Clicks Birthday (₱1,000)</option>
+              <option value="Click Capture Birthday">Click Capture Birthday (₱1,500)</option>
+            </optgroup>
+            <optgroup label="Photographer">
+              <option value="Photographer Session">Photographer Session</option>
+              <option value="Studio Rental">Studio Rental</option>
+            </optgroup>
+            <optgroup label="Events">
+              <option value="Event Booking">Event Booking</option>
+              <option value="Booth Rental">Booth Rental</option>
+            </optgroup>
+            <optgroup label="Other">
+              <option value="Add-on">Add-on / Prints</option>
+              <option value="Custom">Custom (specify in notes)</option>
+            </optgroup>
+          </select>
+        </div>
+        <div class="fg" style="margin-bottom:8px;">
+          <label class="fl" style="font-size:10px;">Notes (optional)</label>
+          <input class="fi" id="ef-pv-notes" placeholder="HMU add-on, prints, etc." style="font-size:12px;">
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px;">
+          <div id="ef-pv-points-preview" style="font-size:11px;color:var(--muted);"></div>
+          <button class="btn btn-gold btn-sm" type="button" onclick="addPastVisit()" id="ef-pv-add-btn">➕ Add Visit</button>
+        </div>
+
+        <!-- Visit history (hidden by default) -->
+        <div id="ef-history-list" style="display:none;margin-top:14px;padding-top:14px;border-top:1px solid var(--border);max-height:180px;overflow-y:auto;"></div>
+      </div>
+
+      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:14px;">
         <button class="btn" onclick="closeEM()">Cancel</button>
         <button class="btn btn-t" onclick="saveEM()">💾 Save Changes</button>
       </div>
@@ -805,6 +864,17 @@ function openEM(name){
   document.getElementById('ef-ref').value=c.referredBy||'';
   document.getElementById('ef-smc').value=c.socialConsent||'';
   document.getElementById('ef-notes').value=c.staffNotes||'';
+  // Reset Past Visit form
+  document.getElementById('ef-pv-date').value = new Date().toISOString().slice(0,10);
+  document.getElementById('ef-pv-amount').value = '';
+  document.getElementById('ef-pv-package').value = '';
+  document.getElementById('ef-pv-notes').value = '';
+  document.getElementById('ef-pv-points-preview').textContent = '';
+  document.getElementById('ef-history-list').style.display = 'none';
+  document.getElementById('ef-history-toggle').textContent = 'Show History';
+  // Wire amount input → live points preview
+  document.getElementById('ef-pv-amount').oninput = updatePtsPreview;
+  document.getElementById('ef-pv-package').onchange = autoFillAmountFromPackage;
   document.getElementById('em-bg').classList.add('open');
 }
 function closeEM(){document.getElementById('em-bg').classList.remove('open');}
@@ -825,6 +895,150 @@ async function saveEM(){
 }
 // Also allow opening edit from the detail panel
 function openEdit(name){openEM(name);}
+
+// ═══════════════════════════════════════════════════════════
+//  📅 ADD PAST VISIT — Backfill old sessions for clients
+// ═══════════════════════════════════════════════════════════
+//  Adds entries to both Registrations (session count)
+//  and Transactions (spent → auto-credits ClickCard points
+//  at the standard 1pt per ₱100 rate).
+// ═══════════════════════════════════════════════════════════
+
+// Default prices per package (auto-fills amount when picked)
+const PV_PRICES = {
+  'Snapshot Selfie': 500, 'Tribe Time': 800, 'Crowd Cam': 1000, 'Crew Captures': 1200,
+  'Frenzy Snaps Birthday': 700, 'Party Clicks Birthday': 1000, 'Click Capture Birthday': 1500
+};
+
+function autoFillAmountFromPackage(){
+  const pkg = document.getElementById('ef-pv-package').value;
+  const amtField = document.getElementById('ef-pv-amount');
+  if(pkg && PV_PRICES[pkg] && !amtField.value){
+    amtField.value = PV_PRICES[pkg];
+    updatePtsPreview();
+  }
+}
+
+function updatePtsPreview(){
+  const amt = parseFloat(document.getElementById('ef-pv-amount').value) || 0;
+  const pts = Math.floor(amt / 100);
+  const el = document.getElementById('ef-pv-points-preview');
+  if(amt > 0) el.innerHTML = '<span style="color:var(--teal);font-weight:700;">+' + pts + ' ClickCard pts</span> will credit';
+  else el.textContent = '';
+}
+
+async function addPastVisit(){
+  const name   = document.getElementById('ef-name').value.trim();
+  const date   = document.getElementById('ef-pv-date').value;
+  const amount = parseFloat(document.getElementById('ef-pv-amount').value) || 0;
+  const pkg    = document.getElementById('ef-pv-package').value;
+  const notes  = document.getElementById('ef-pv-notes').value.trim();
+
+  if(!date)   { showToast('⚠ Pick a visit date'); return; }
+  if(amount <= 0) { showToast('⚠ Enter the amount paid'); return; }
+  if(!pkg)    { showToast('⚠ Select a package'); return; }
+
+  const btn = document.getElementById('ef-pv-add-btn');
+  btn.disabled = true; btn.textContent = '⏳ Adding…';
+  showToast('📅 Recording past visit for '+name+'…');
+
+  try{
+    const r = await gas('addPastVisit', {
+      fbName: name,
+      date: date,
+      package: pkg,
+      total: amount,
+      notes: notes,
+      addedBy: 'CRM Admin'
+    });
+    if(!r.ok) throw new Error(r.error || 'Unknown error');
+
+    const pts = Math.floor(amount / 100);
+    showToast('✅ Visit added · +'+pts+' pts credited');
+
+    // Reset form for next entry
+    document.getElementById('ef-pv-amount').value = '';
+    document.getElementById('ef-pv-package').value = '';
+    document.getElementById('ef-pv-notes').value = '';
+    document.getElementById('ef-pv-points-preview').textContent = '';
+    btn.disabled = false; btn.textContent = '➕ Add Visit';
+
+    // Refresh data so CRM recomputes points/tier/lifecycle
+    await doSync();
+    // Refresh visit history if it's currently shown
+    if(document.getElementById('ef-history-list').style.display !== 'none'){
+      renderVisitHistory(name);
+    }
+    // Refresh detail panel if open
+    if(document.getElementById('dp').classList.contains('open')) openD(name);
+  }catch(e){
+    showToast('❌ '+e.message);
+    btn.disabled = false; btn.textContent = '➕ Add Visit';
+  }
+}
+
+function toggleVisitHistory(){
+  const list = document.getElementById('ef-history-list');
+  const btn  = document.getElementById('ef-history-toggle');
+  if(list.style.display === 'none'){
+    list.style.display = '';
+    btn.textContent = 'Hide History';
+    renderVisitHistory(document.getElementById('ef-name').value.trim());
+  } else {
+    list.style.display = 'none';
+    btn.textContent = 'Show History';
+  }
+}
+
+function renderVisitHistory(name){
+  const list = document.getElementById('ef-history-list');
+  const nL = name.toLowerCase();
+  // Pull from RAW data (loaded by doSync)
+  const regs = (RAW.registrations || []).filter(r => (r.fbName||'').toLowerCase() === nL);
+  const txns = (RAW.transactions || []).filter(t => (t.clientName||'').toLowerCase() === nL);
+
+  // Combine and sort by date desc
+  const visits = [];
+  regs.forEach(r => visits.push({
+    date: r.date || '',
+    type: 'reg',
+    package: r.package || r.service || '—',
+    amount: 0
+  }));
+  txns.forEach(t => visits.push({
+    date: t.date || '',
+    type: 'txn',
+    package: t.package || t.service || '—',
+    amount: parseFloat(t.total) || 0
+  }));
+  visits.sort((a,b) => String(b.date).localeCompare(String(a.date)));
+
+  if(!visits.length){
+    list.innerHTML = '<div style="text-align:center;padding:14px;font-size:11px;color:var(--muted);">No prior visits on record.</div>';
+    return;
+  }
+
+  let totalSpent = 0;
+  visits.forEach(v => totalSpent += v.amount);
+  const totalPts = Math.floor(totalSpent / 100);
+
+  list.innerHTML =
+    '<div style="font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);font-weight:700;margin-bottom:8px;display:flex;justify-content:space-between;">' +
+      '<span>Visit Records ('+visits.length+')</span>' +
+      '<span>Lifetime: ₱'+fmt(totalSpent)+' · '+totalPts+' pts</span>' +
+    '</div>' +
+    visits.map(v =>
+      '<div style="padding:8px 10px;border-bottom:1px solid var(--border);font-size:11px;display:flex;justify-content:space-between;align-items:center;gap:10px;">' +
+        '<div>' +
+          '<div style="font-weight:600;color:var(--slate);">'+esc(v.package)+'</div>' +
+          '<div style="color:var(--muted);font-size:10px;">'+esc(v.date)+' · '+(v.type==='txn'?'💰 paid':'📋 visit')+'</div>' +
+        '</div>' +
+        '<div style="text-align:right;font-weight:700;color:'+(v.amount>0?'var(--teal)':'var(--muted)')+';">' +
+          (v.amount>0 ? '₱'+fmt(v.amount) : '—') +
+        '</div>' +
+      '</div>'
+    ).join('');
+}
 
 // ═══════════════════════════════════════
 //  DATA CLEANUP TAB
