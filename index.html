@@ -1463,19 +1463,28 @@ async function emPreview(){
   } else if(EM_RECIPIENTS.length){
     clientId = EM_RECIPIENTS[0].fbName || EM_RECIPIENTS[0].email || '';
   }
+  const iframe = document.getElementById('em-preview-iframe');
+  // Show loading state in iframe immediately
+  iframe.srcdoc = '<html><body style="font-family:sans-serif;padding:24px;text-align:center;color:#888;">Loading preview…</body></html>';
+  document.getElementById('em-preview-subj').textContent = 'Loading…';
   try{
     const r = await gas('previewEmail', {
       templateKey: EM_SELECTED.key,
       clientId: clientId,
       extras: emGetExtras()
     });
-    if(!r.ok) throw new Error(r.error);
-    document.getElementById('em-preview-subj').textContent = r.subject;
-    const iframe = document.getElementById('em-preview-iframe');
-    const doc = iframe.contentDocument || iframe.contentWindow.document;
-    doc.open(); doc.write(r.html); doc.close();
+    if(!r || !r.ok) throw new Error((r && r.error) || 'No response from GAS');
+    if(!r.html) throw new Error('Template returned empty HTML');
+    document.getElementById('em-preview-subj').textContent = r.subject || '(no subject)';
+    // Wrap in a complete HTML document so srcdoc renders reliably across browsers
+    iframe.srcdoc = '<!DOCTYPE html><html><head><meta charset="UTF-8"><base target="_blank"><style>body{margin:0;font-family:Arial,sans-serif;}</style></head><body>'+r.html+'</body></html>';
   }catch(e){
     document.getElementById('em-preview-subj').textContent = '⚠ '+e.message;
+    iframe.srcdoc = '<html><body style="font-family:sans-serif;padding:24px;color:#c0544a;">' +
+      '<div style="font-weight:700;margin-bottom:8px;">⚠ Preview failed</div>' +
+      '<div style="font-size:13px;line-height:1.5;color:#666;">'+esc(e.message)+'</div>' +
+      '<div style="font-size:11px;color:#888;margin-top:14px;">Common causes:<ul style="margin:6px 0 0 18px;line-height:1.6;"><li>The email engine hasn\'t been deployed (run em_authorize once)</li><li>The router isn\'t catching email actions — confirm the indexOf(\'mail\') wire-in is in your doGet</li><li>Pick a template from the left sidebar if none is selected</li></ul></div>' +
+      '</body></html>';
   }
 }
 
