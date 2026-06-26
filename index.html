@@ -227,7 +227,7 @@ tr.cl-row:hover td{background:rgba(81,137,125,.03);}
               <div style="background:var(--white);border-radius:12px;padding:14px 16px;margin-bottom:12px;border:1px solid var(--border);">
                 <div style="font-size:11px;font-weight:700;color:var(--slate);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px;">👥 Recipients</div>
 
-                <!-- Smart filters using lifecycle stages & RFM data -->
+                <!-- Smart filters using lifecycle stages, RFM data & visit recency -->
                 <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:6px;margin-bottom:10px;">
                   <select id="em-filter-stage" class="sel" onchange="emRecalcRecipients()" style="padding:7px 10px;border:1.5px solid var(--border);border-radius:6px;font-size:11px;background:var(--white);">
                     <option value="all">All lifecycle stages</option>
@@ -246,12 +246,48 @@ tr.cl-row:hover td{background:rgba(81,137,125,.03);}
                     <option value="Bronze">🥉 Bronze only</option>
                     <option value="New">🌱 New only</option>
                   </select>
+                  <select id="em-filter-recency" class="sel" onchange="emRecalcRecipients()" style="padding:7px 10px;border:1.5px solid var(--border);border-radius:6px;font-size:11px;background:var(--white);">
+                    <optgroup label="Recent visits">
+                      <option value="all">Any visit date</option>
+                      <option value="last_7d">📅 Visited last 7 days</option>
+                      <option value="last_15d">📅 Visited last 15 days</option>
+                      <option value="last_30d">📅 Visited last 30 days</option>
+                      <option value="last_60d">📅 Visited last 60 days</option>
+                      <option value="last_90d">📅 Visited last 90 days</option>
+                    </optgroup>
+                    <optgroup label="Inactive">
+                      <option value="not_30d">⏰ No visit in 30+ days</option>
+                      <option value="not_60d">⏰ No visit in 60+ days</option>
+                      <option value="not_90d">⏰ No visit in 90+ days</option>
+                      <option value="not_180d">⏰ No visit in 180+ days</option>
+                    </optgroup>
+                    <optgroup label="Onboarding">
+                      <option value="new_30d">🆕 New this month (30d)</option>
+                      <option value="never_visited">🌱 Never visited (lead)</option>
+                    </optgroup>
+                  </select>
                   <select id="em-filter-extra" class="sel" onchange="emRecalcRecipients()" style="padding:7px 10px;border:1.5px solid var(--border);border-radius:6px;font-size:11px;background:var(--white);">
                     <option value="">No additional filter</option>
-                    <option value="birthday_month">🎂 Birthday this month</option>
-                    <option value="has_email">📧 Has email only</option>
-                    <option value="rfm_high">⭐ Best clients (RFM 12+)</option>
-                    <option value="one">📧 Just one specific client</option>
+                    <optgroup label="Engagement">
+                      <option value="has_email">📧 Has email only</option>
+                      <option value="rfm_high">⭐ Best clients (RFM 12+)</option>
+                      <option value="rfm_low">😴 At risk (RFM ≤ 6)</option>
+                    </optgroup>
+                    <optgroup label="Spend">
+                      <option value="spent_500">💰 Spent ₱500+</option>
+                      <option value="spent_2000">💰 Spent ₱2,000+</option>
+                      <option value="spent_5000">💰 Spent ₱5,000+</option>
+                      <option value="spent_10000">💎 Spent ₱10,000+</option>
+                    </optgroup>
+                    <optgroup label="Visits">
+                      <option value="visits_2">🔁 2+ visits</option>
+                      <option value="visits_3">🔁 3+ visits</option>
+                      <option value="visits_5">🔁 5+ visits</option>
+                    </optgroup>
+                    <optgroup label="Special">
+                      <option value="birthday_month">🎂 Birthday this month</option>
+                      <option value="one">📧 Just one specific client</option>
+                    </optgroup>
                   </select>
                 </div>
 
@@ -1324,9 +1360,10 @@ function emGetExtras(){
 }
 
 function emRecalcRecipients(){
-  const stage = document.getElementById('em-filter-stage').value;
-  const tier  = document.getElementById('em-filter-tier').value;
-  const extra = document.getElementById('em-filter-extra').value;
+  const stage   = document.getElementById('em-filter-stage').value;
+  const tier    = document.getElementById('em-filter-tier').value;
+  const recency = document.getElementById('em-filter-recency').value;
+  const extra   = document.getElementById('em-filter-extra').value;
 
   document.getElementById('em-single-field').style.display = extra==='one' ? '' : 'none';
 
@@ -1340,10 +1377,37 @@ function emRecalcRecipients(){
   const now = new Date();
   const curMonth = now.getMonth() + 1;
 
+  // Helper: how many days ago was a given ISO date string?
+  function daysAgo(dateStr){
+    if(!dateStr) return null;
+    const d = new Date(String(dateStr).slice(0,10) + 'T00:00:00');
+    if(isNaN(d.getTime())) return null;
+    return Math.floor((now - d) / 86400000);
+  }
+
   EM_RECIPIENTS = (ALL || []).filter(c => {
-    if(!c.email || c.email.indexOf('@')===-1) return false;
+    if(!c.email || c.email.indexOf('@')===-1) return false; // must have email
     if(stage !== 'all' && c._stage !== stage) return false;
-    if(tier !== 'all' && c._tier !== tier) return false;
+    if(tier  !== 'all' && c._tier  !== tier ) return false;
+
+    // ── Recency filter ──
+    if(recency && recency !== 'all'){
+      const lvDays = daysAgo(c._lastVisit);
+      const addedDays = daysAgo(c.added);
+      if(recency === 'last_7d'   && (lvDays === null || lvDays > 7))   return false;
+      if(recency === 'last_15d'  && (lvDays === null || lvDays > 15))  return false;
+      if(recency === 'last_30d'  && (lvDays === null || lvDays > 30))  return false;
+      if(recency === 'last_60d'  && (lvDays === null || lvDays > 60))  return false;
+      if(recency === 'last_90d'  && (lvDays === null || lvDays > 90))  return false;
+      if(recency === 'not_30d'   && (lvDays !== null && lvDays <= 30))  return false;
+      if(recency === 'not_60d'   && (lvDays !== null && lvDays <= 60))  return false;
+      if(recency === 'not_90d'   && (lvDays !== null && lvDays <= 90))  return false;
+      if(recency === 'not_180d'  && (lvDays !== null && lvDays <= 180)) return false;
+      if(recency === 'new_30d'   && (addedDays === null || addedDays > 30)) return false;
+      if(recency === 'never_visited' && c._sessions > 0) return false;
+    }
+
+    // ── Extra filters ──
     if(extra === 'birthday_month'){
       if(!c.birthday) return false;
       const bd = new Date(c.birthday);
@@ -1351,6 +1415,16 @@ function emRecalcRecipients(){
       if((bd.getMonth()+1) !== curMonth) return false;
     }
     if(extra === 'rfm_high' && (!c._rfm || c._rfm < 12)) return false;
+    if(extra === 'rfm_low'  && (!c._rfm || c._rfm > 6))  return false;
+    if(extra === 'spent_500'   && (c._spent || 0) < 500)   return false;
+    if(extra === 'spent_2000'  && (c._spent || 0) < 2000)  return false;
+    if(extra === 'spent_5000'  && (c._spent || 0) < 5000)  return false;
+    if(extra === 'spent_10000' && (c._spent || 0) < 10000) return false;
+    if(extra === 'visits_2' && (c._sessions || 0) < 2) return false;
+    if(extra === 'visits_3' && (c._sessions || 0) < 3) return false;
+    if(extra === 'visits_5' && (c._sessions || 0) < 5) return false;
+    // has_email already enforced at the top
+
     return true;
   });
 
@@ -1360,11 +1434,15 @@ function emRecalcRecipients(){
   if(n){
     const listHtml = EM_RECIPIENTS.slice(0, 50).map(c => {
       const tierC = tierCol(c._tier);
+      const lvDays = daysAgo(c._lastVisit);
+      const lvBadge = lvDays !== null
+        ? '<span style="color:'+(lvDays<=30?'var(--success)':lvDays<=90?'var(--gold)':'var(--muted)')+';">'+lvDays+'d ago</span>'
+        : '<span style="color:var(--muted);">no visits</span>';
       return '<div style="padding:7px 11px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;font-size:11px;">' +
         '<div><strong>'+esc(c.fbName||'(no name)')+'</strong><br><span style="color:var(--muted);font-size:10px;">'+esc(c.email)+'</span></div>' +
         '<div style="text-align:right;font-size:10px;">' +
           '<span style="color:'+tierC+';font-weight:700;">'+esc(c._tier||'New')+'</span><br>' +
-          '<span style="color:var(--muted);">'+c._pts+'pts · '+c._sessions+' visits</span>' +
+          '<span style="color:var(--muted);">'+c._sessions+' visits · '+lvBadge+'</span>' +
         '</div>' +
       '</div>';
     }).join('');
